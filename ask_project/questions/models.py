@@ -1,9 +1,10 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
 class Category(models.Model):
     """Категории"""
-    name = models.CharField(max_length=50, verbose_name='Category')
+    name = models.CharField(max_length=50, unique=True, verbose_name='Category')
     image = models.ImageField(upload_to='static/images/categories', verbose_name='Image')
     url = models.SlugField(max_length=160, unique=True)
 
@@ -14,10 +15,12 @@ class Category(models.Model):
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
 
-class User(models.User):
+class User(AbstractUser):
     """Пользователи"""
     avatar = models.ImageField(upload_to='static/images/avatars', verbose_name='Avatar')
     rating = models.IntegerField(default=0, verbose_name='Rating')
+    is_activated = models.BooleanField(default=True, verbose_name="Is user's email activated?")
+    send_messages = models.BooleanField(default=True, verbose_name='Send notifications?')
     
     def __str__(self) -> str:
         return self.username
@@ -28,7 +31,7 @@ class User(models.User):
 
 class Tag(models.Model):
     """Теги"""
-    title = models.CharField(max_length=20, verbose_name='Tag')
+    title = models.CharField(max_length=20, unique=True, verbose_name='Tag')
     url = models.SlugField(max_length=160, unique=True)
     
     def __str__(self) -> str:
@@ -48,8 +51,7 @@ class Question(models.Model):
     likes = models.IntegerField(default=0, verbose_name='Likes')
     dislikes = models.IntegerField(default=0, verbose_name='Dislikes')
     viewes = models.IntegerField(default=0, verbose_name='Views')
-    additional_images = models.ForeignKey(verbose_name='AdditionalImages')
-    tags = models.ManyToManyField(Tag, verbose_name='Tag')
+    tags = models.ManyToManyField(Tag, verbose_name='Tag', related_name='question_tags')
     draft = models.BooleanField(default=False, verbose_name='Draft')
     url = models.URLField(max_length=160, unique=True)
 
@@ -63,8 +65,8 @@ class Question(models.Model):
     
 class Answer(models.Model):
     """Ответы"""
-    question = models.ForeignKey(Question, verbose_name='Question')
-    author = models.ForeignKey(User, verbose_name='Author')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='Question')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Author')
     content = models.TextField(verbose_name='Answer')
     date_published = models.DateField(verbose_name='Publication date')
     likes = models.IntegerField(default=0, verbose_name='Likes')
@@ -72,14 +74,14 @@ class Answer(models.Model):
     best_answer = models.BooleanField(default=False, verbose_name='Best answer')
 
     class Meta:
-        ordering = ['-date_published']
+        ordering = ['likes']
         verbose_name = 'Answer'
         verbose_name_plural = 'Answers'
     
 class QuestionImages(models.Model):
     """Прикрепленные изображения"""
-    question = models.ForeignKey(Question, verbose_name='Question')
-    image = models.ImageField(upload_to='static/images/questions_images', verbose_name='Image')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='Question')
+    image = models.ImageField(blank=True, upload_to='static/images/questions_images', verbose_name='Image')
 
     class Meta:
         verbose_name = 'Question image'
