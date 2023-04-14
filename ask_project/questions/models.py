@@ -17,7 +17,7 @@ class Category(models.Model):
 
 class User(AbstractUser):
     """Пользователи"""
-    avatar = models.ImageField(upload_to='static/images/avatars', verbose_name='Avatar')
+    avatar = models.ImageField(null=True, upload_to='static/images/avatars', verbose_name='Avatar')
     rating = models.IntegerField(default=0, verbose_name='Rating')
     is_activated = models.BooleanField(default=True, verbose_name="Is user's email activated?")
     send_messages = models.BooleanField(default=True, verbose_name='Send notifications?')
@@ -51,7 +51,7 @@ class Question(models.Model):
     likes = models.IntegerField(default=0, verbose_name='Likes')
     dislikes = models.IntegerField(default=0, verbose_name='Dislikes')
     viewes = models.IntegerField(default=0, verbose_name='Views')
-    tags = models.ManyToManyField(Tag, verbose_name='Tag', related_name='question_tags')
+    tags = models.ManyToManyField(Tag, null=True, verbose_name='Tag', related_name='question_tags')
     draft = models.BooleanField(default=False, verbose_name='Draft')
     url = models.URLField(max_length=160, unique=True)
 
