@@ -1,7 +1,12 @@
 from django.shortcuts import render
+from django.views.generic.base import View
 
-def home_page(request):
-    return render(request, 'questions/index.html')
+from .models import Question
 
-def question_detail(request):
-    return render(request, 'questions/question.html')
+
+class QuestionsView(View):
+    """Questions list"""
+    def get(self, request):
+        questions = Question.objects.all()
+        context = {'question_list': questions}
+        return render(request, 'questions/index.html', context)

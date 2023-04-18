@@ -3,9 +3,9 @@ from django.contrib.auth.models import AbstractUser
 
 
 class Category(models.Model):
-    """Категории"""
+    """Categories"""
     name = models.CharField(max_length=50, unique=True, verbose_name='Category')
-    image = models.ImageField(upload_to='static/images/categories', verbose_name='Image')
+    image = models.ImageField(upload_to='categories/', verbose_name='Image')
     url = models.SlugField(max_length=160, unique=True)
 
     def __str__(self) -> str:
@@ -16,8 +16,8 @@ class Category(models.Model):
         verbose_name_plural = 'Categories'
 
 class User(AbstractUser):
-    """Пользователи"""
-    avatar = models.ImageField(null=True, upload_to='static/images/avatars', verbose_name='Avatar')
+    """Users"""
+    avatar = models.ImageField(null=True, upload_to='avatars/', verbose_name='Avatar')
     rating = models.IntegerField(default=0, verbose_name='Rating')
     is_activated = models.BooleanField(default=True, verbose_name="Is user's email activated?")
     send_messages = models.BooleanField(default=True, verbose_name='Send notifications?')
@@ -30,7 +30,7 @@ class User(AbstractUser):
         verbose_name_plural = 'Users'
 
 class Tag(models.Model):
-    """Теги"""
+    """Tags"""
     title = models.CharField(max_length=20, unique=True, verbose_name='Tag')
     url = models.SlugField(max_length=160, unique=True)
     
@@ -42,7 +42,7 @@ class Tag(models.Model):
         verbose_name_plural = 'Tags'
 
 class Question(models.Model):
-    """Вопросы"""
+    """Questions"""
     title = models.CharField(max_length=50, verbose_name='Title')
     category = models.ForeignKey(Category, on_delete=models.PROTECT, verbose_name='Category')
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='User')
@@ -53,7 +53,7 @@ class Question(models.Model):
     viewes = models.IntegerField(default=0, verbose_name='Views')
     tags = models.ManyToManyField(Tag, null=True, verbose_name='Tag', related_name='question_tags')
     draft = models.BooleanField(default=False, verbose_name='Draft')
-    url = models.URLField(max_length=160, unique=True)
+    url = models.SlugField(max_length=160, unique=True)
 
     def __str__(self) -> str:
         return self.title
@@ -64,7 +64,7 @@ class Question(models.Model):
         verbose_name_plural = 'Questions'
     
 class Answer(models.Model):
-    """Ответы"""
+    """Answers"""
     question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='Question')
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Author')
     content = models.TextField(verbose_name='Answer')
@@ -79,9 +79,9 @@ class Answer(models.Model):
         verbose_name_plural = 'Answers'
     
 class QuestionImages(models.Model):
-    """Прикрепленные изображения"""
+    """Additional images"""
     question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='Question')
-    image = models.ImageField(blank=True, upload_to='static/images/questions_images', verbose_name='Image')
+    image = models.ImageField(blank=True, upload_to='questions_images/', verbose_name='Image')
 
     class Meta:
         verbose_name = 'Question image'
