@@ -1,11 +1,12 @@
 from django.db import models
+from django.urls import reverse
 from django.contrib.auth.models import AbstractUser
 
 
 class Category(models.Model):
     """Categories"""
     name = models.CharField(max_length=50, unique=True, verbose_name='Category')
-    image = models.ImageField(upload_to='categories/', verbose_name='Image')
+    image = models.ImageField(null=True, upload_to='categories/', verbose_name='Image')
     url = models.SlugField(max_length=160, unique=True)
 
     def __str__(self) -> str:
@@ -51,12 +52,16 @@ class Question(models.Model):
     likes = models.IntegerField(default=0, verbose_name='Likes')
     dislikes = models.IntegerField(default=0, verbose_name='Dislikes')
     viewes = models.IntegerField(default=0, verbose_name='Views')
-    tags = models.ManyToManyField(Tag, null=True, verbose_name='Tag', related_name='question_tags')
+    tags = models.ManyToManyField(Tag, verbose_name='Tag', related_name='question_tags')
     draft = models.BooleanField(default=False, verbose_name='Draft')
     url = models.SlugField(max_length=160, unique=True)
 
     def __str__(self) -> str:
         return self.title
+    
+    def get_absolute_url(self):
+        return reverse('question_detail', kwargs={'slug': self.url})
+
     
     class Meta:
         ordering = ['-date_published']
