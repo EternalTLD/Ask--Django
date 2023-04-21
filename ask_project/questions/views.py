@@ -34,3 +34,9 @@ class QuestionDetailView(DetailView):
     model = Question
     slug_field = 'url'
     template_name = 'questions/question_detail.html'
+
+def registration_view(request):
+    return render(request, 'questions/registration.html')
+
+def login_view(request):
+    return render(request, 'questions/login.html')
