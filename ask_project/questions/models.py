@@ -12,6 +12,9 @@ class Category(models.Model):
     def __str__(self) -> str:
         return self.name
     
+    def get_absolute_url(self):
+        return reverse('by_category', kwargs={'slug': self.url})
+
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
@@ -33,10 +36,13 @@ class User(AbstractUser):
 class Tag(models.Model):
     """Tags"""
     title = models.CharField(max_length=20, unique=True, verbose_name='Tag')
-    url = models.SlugField(max_length=160, unique=True)
+    url = models.SlugField(max_length=160, unique=True, default=title)
     
     def __str__(self) -> str:
         return self.title
+    
+    def get_absolute_url(self):
+        return reverse('by_tag', kwargs={'slug': self.url})
 
     class Meta:
         verbose_name = 'Tag'
@@ -45,14 +51,16 @@ class Tag(models.Model):
 class Question(models.Model):
     """Questions"""
     title = models.CharField(max_length=50, verbose_name='Title')
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, verbose_name='Category')
+    category = models.ForeignKey(
+        Category, on_delete=models.PROTECT, verbose_name='Category', related_name='category'
+    )
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='User')
     date_published = models.DateField(verbose_name='Publication date')
     content = models.TextField(verbose_name='Question')
     likes = models.IntegerField(default=0, verbose_name='Likes')
     dislikes = models.IntegerField(default=0, verbose_name='Dislikes')
     viewes = models.IntegerField(default=0, verbose_name='Views')
-    tags = models.ManyToManyField(Tag, verbose_name='Tag', related_name='question_tags')
+    tags = models.ManyToManyField(Tag, verbose_name='Tag', related_name='tags')
     draft = models.BooleanField(default=False, verbose_name='Draft')
     url = models.SlugField(max_length=160, unique=True)
 

@@ -7,16 +7,12 @@
 {% block content %}
 <div class="col-11">
     <span>
-        <h2 class="mt-3 p-3 border bg-light rounded">
-            <a>New questions</a>
-            <a href="#">#Popular</a>
-            <button style="position: relative; left: 280px; font-size: 20px; padding: 8px 32px;" type="button" class="btn btn-success " data-mdb-ripple-color="dark">Ask</button>
-        </h2>
-        
+        <h2 class="mt-3 p-3 border bg-light rounded"><a>{{ category }}</a></h2>
     </span>
 </div>
 
 <div class="col-11">
+
     {% for question in question_list %}
     <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
         <div class="col p-4 d-flex flex-column position-static">
