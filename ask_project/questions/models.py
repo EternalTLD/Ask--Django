@@ -1,7 +1,8 @@
 from django.db import models
 from django.urls import reverse
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 class Category(models.Model):
     """Categories"""
@@ -13,25 +14,11 @@ class Category(models.Model):
         return self.name
     
     def get_absolute_url(self):
-        return reverse('by_category', kwargs={'slug': self.url})
+        return reverse('questions:by_category', kwargs={'slug': self.url})
 
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
-
-class User(AbstractUser):
-    """Users"""
-    avatar = models.ImageField(null=True, upload_to='avatars/', verbose_name='Avatar')
-    rating = models.IntegerField(default=0, verbose_name='Rating')
-    is_activated = models.BooleanField(default=True, verbose_name="Is user's email activated?")
-    send_messages = models.BooleanField(default=True, verbose_name='Send notifications?')
-    
-    def __str__(self) -> str:
-        return self.username
-    
-    class Meta:
-        verbose_name = 'User'
-        verbose_name_plural = 'Users'
 
 class Tag(models.Model):
     """Tags"""
@@ -42,7 +29,7 @@ class Tag(models.Model):
         return self.title
     
     def get_absolute_url(self):
-        return reverse('by_tag', kwargs={'slug': self.url})
+        return reverse('questions:by_tag', kwargs={'slug': self.url})
 
     class Meta:
         verbose_name = 'Tag'
@@ -52,7 +39,10 @@ class Question(models.Model):
     """Questions"""
     title = models.CharField(max_length=50, verbose_name='Title')
     category = models.ForeignKey(
-        Category, on_delete=models.PROTECT, verbose_name='Category', related_name='category'
+        Category, 
+        on_delete=models.PROTECT, 
+        verbose_name='Category', 
+        related_name='category'
     )
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='User')
     date_published = models.DateField(verbose_name='Publication date')
@@ -68,7 +58,7 @@ class Question(models.Model):
         return self.title
     
     def get_absolute_url(self):
-        return reverse('question_detail', kwargs={'slug': self.url})
+        return reverse('questions:question_detail', kwargs={'slug': self.url})
 
     
     class Meta:
