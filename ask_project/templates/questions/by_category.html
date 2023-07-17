@@ -1,0 +1,41 @@
+{% extends "layout/basic.html" %}
+
+{% load static %}
+{% load bootstrap5 %}
+
+
+{% block content %}
+<div class="col-11">
+    <span>
+        <h2 class="mt-3 p-3 border bg-light rounded"><a>{{ category }}</a></h2>
+    </span>
+</div>
+
+<div class="col-11">
+
+    {% for question in question_list %}
+    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+        <div class="col p-4 d-flex flex-column position-static">
+            <strong class="d-inline-block mb-1 text-success">{{ question.category.name }}</strong>
+            <h3 class="mb-1"><a href="{{ question.get_absolute_url }}" class="href">{{ question.title }}</a></h3>
+            <div class="mb-1 text-muted">
+                Author: <a href="{{ question.author.get_absolute_url }}">{{ question.author }}</a>
+                <div>{{ question.date_published }}</div>
+            </div>
+            <p class="mb-1 mt-1">{{ question.content }}</p>
+
+            <span>
+                <h5 class="mt-2 text-muted">Rating: 7</h5>
+                <button type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark">Like</button>
+                <button type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark">Dislike</button>
+            </span>
+            <span>tags: {%for tag in question.tags.all %}{{ tag.title }} {% endfor %}</span>
+            </div>
+        <div class="col-auto d-none d-lg-block">
+            <svg class="bd-placeholder-img" width="300" height="300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"/></svg>
+        </div>
+    </div>
+    {% endfor %}
+    
+</div>
+{% endblock %}
