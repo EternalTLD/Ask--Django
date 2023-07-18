@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.query import QuerySet
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.auth import get_user_model
@@ -35,6 +36,10 @@ class Tag(models.Model):
     
     def get_absolute_url(self):
         return reverse('questions:by_tag', kwargs={'slug': self.slug})
+    
+class PublishedMnanger(models.Manager):
+    def get_queryset(self) -> QuerySet:
+        return super().get_queryset().filter(draft=False)
 
 class Question(models.Model):
     """Questions"""
@@ -56,6 +61,9 @@ class Question(models.Model):
     tags = models.ManyToManyField(Tag, verbose_name='Теги', related_name='tags')
     draft = models.BooleanField(default=False, verbose_name='Черновик')
     slug = models.SlugField(max_length=160, unique=True)
+
+    objects = models.Manager()
+    published = PublishedMnanger()
 
     class Meta:
         ordering = ['-date_published']
