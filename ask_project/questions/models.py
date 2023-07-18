@@ -8,13 +8,13 @@ class Category(models.Model):
     """Categories"""
     name = models.CharField(max_length=50, unique=True, verbose_name='Category')
     image = models.ImageField(null=True, upload_to='categories/', verbose_name='Image')
-    url = models.SlugField(max_length=160, unique=True)
+    slug = models.SlugField(max_length=160, unique=True)
 
     def __str__(self) -> str:
         return self.name
     
     def get_absolute_url(self):
-        return reverse('questions:by_category', kwargs={'slug': self.url})
+        return reverse('questions:by_category', kwargs={'slug': self.slug})
 
     class Meta:
         verbose_name = 'Category'
@@ -23,13 +23,13 @@ class Category(models.Model):
 class Tag(models.Model):
     """Tags"""
     title = models.CharField(max_length=20, unique=True, verbose_name='Tag')
-    url = models.SlugField(max_length=160, unique=True, default=title)
+    slug = models.SlugField(max_length=160, unique=True, default=title)
     
     def __str__(self) -> str:
         return self.title
     
     def get_absolute_url(self):
-        return reverse('questions:by_tag', kwargs={'slug': self.url})
+        return reverse('questions:by_tag', kwargs={'slug': self.slug})
 
     class Meta:
         verbose_name = 'Tag'
@@ -52,13 +52,13 @@ class Question(models.Model):
     viewes = models.IntegerField(default=0, verbose_name='Views')
     tags = models.ManyToManyField(Tag, verbose_name='Tag', related_name='tags')
     draft = models.BooleanField(default=False, verbose_name='Draft')
-    url = models.SlugField(max_length=160, unique=True)
+    slug = models.SlugField(max_length=160, unique=True)
 
     def __str__(self) -> str:
         return self.title
     
     def get_absolute_url(self):
-        return reverse('questions:question_detail', kwargs={'slug': self.url})
+        return reverse('questions:question_detail', kwargs={'slug': self.slug})
 
     
     class Meta:
