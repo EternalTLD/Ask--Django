@@ -43,14 +43,24 @@ class PublishedMnanger(models.Manager):
 
 class Question(models.Model):
     """Questions"""
-    title = models.CharField(max_length=50, verbose_name='Заголовок')
+    title = models.CharField(max_length=25, verbose_name='Заголовок')
     category = models.ForeignKey(
         Category, 
-        on_delete=models.PROTECT, 
+        on_delete=models.PROTECT,
+        related_name='questions', 
         verbose_name='Категория', 
-        related_name='category'
     )
-    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор')
+    author = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE,
+        related_name= 'questions', 
+        verbose_name='Автор',
+    )
+    tags = models.ManyToManyField(
+        Tag, 
+        verbose_name='Теги',
+        related_name='questions',
+    )
     date_published = models.DateTimeField(default=timezone.now, verbose_name='Дата публикации')
     date_created = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     date_updated = models.DateTimeField(auto_now=True, verbose_name='Дата изменения')
@@ -58,9 +68,8 @@ class Question(models.Model):
     likes = models.IntegerField(default=0, verbose_name='Лайки')
     dislikes = models.IntegerField(default=0, verbose_name='Дизлайки')
     viewes = models.IntegerField(default=0, verbose_name='Просмотры')
-    tags = models.ManyToManyField(Tag, verbose_name='Теги', related_name='tags')
     draft = models.BooleanField(default=False, verbose_name='Черновик')
-    slug = models.SlugField(max_length=160, unique=True)
+    slug = models.SlugField(max_length=25)
 
     objects = models.Manager()
     published = PublishedMnanger()
@@ -77,25 +86,39 @@ class Question(models.Model):
         return self.title
     
     def get_absolute_url(self):
-        return reverse('questions:question_detail', kwargs={'slug': self.slug})
+        return reverse('questions:question_detail', kwargs={'id': self.pk, 'slug': self.slug})
     
 class Answer(models.Model):
     """Answers"""
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='Вопрос')
-    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Автор')
+    question = models.ForeignKey(
+        Question, 
+        on_delete=models.CASCADE,
+        related_name='answers', 
+        verbose_name='Вопрос',
+    )
+    author = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='answers',
+        verbose_name='Автор',
+    )
     content = models.TextField(verbose_name='Содержание')
-    date_published = models.DateField(verbose_name='Дата публикации')
+    date_published = models.DateField(auto_now_add=True, verbose_name='Дата публикации')
     likes = models.IntegerField(default=0, verbose_name='Лайки')
     dislikes = models.IntegerField(default=0, verbose_name='Дизлайки')
     best_answer = models.BooleanField(default=False, verbose_name='Лучший ответ')
+    active = models.BooleanField(default=True, verbose_name='Активный')
 
     class Meta:
-        ordering = ['-likes']
+        ordering = ['-likes', 'date_published']
         indexes = [
-            models.Index(fields=['-likes'])
+            models.Index(fields=['-likes', 'date_published'])
         ]
         verbose_name = 'Ответ'
         verbose_name_plural = 'Ответы'
+
+    def __str__(self) -> str:
+        return f'Ответ {self.author} на вопрос {self.question}'
     
 class QuestionImages(models.Model):
     """Additional images"""
@@ -103,5 +126,14 @@ class QuestionImages(models.Model):
     image = models.ImageField(blank=True, upload_to='questions_images/', verbose_name='Картинка')
 
     class Meta:
-        verbose_name = 'Прикрепленная картинка'
-        verbose_name_plural = 'Прикрепленные картинки'
+        verbose_name = 'Картинка к вопросу'
+        verbose_name_plural = 'Картинки к вопросу'
+
+class AnswerImages(models.Model):
+    """Additional images"""
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE, verbose_name='Ответ')
+    image = models.ImageField(blank=True, null=True, upload_to='questions_images/', verbose_name='Картинка')
+
+    class Meta:
+        verbose_name = 'Картинка к ответу'
+        verbose_name_plural = 'Картинки к ответу'

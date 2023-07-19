@@ -14,11 +14,9 @@ class QuestionAdmin(admin.ModelAdmin):
 
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
-    list_display = ['question', 'author', 'date_published', 'best_answer']
-    list_filter = ['question', 'author', 'date_published', 'best_answer', ]
+    list_display = ['question', 'author', 'date_published', 'best_answer', 'active']
+    list_filter = ['question', 'author', 'date_published', 'best_answer', 'active']
     search_fields = ['question', 'content']
-    raw_id_fields = ['author']
-    date_hierarchy = 'date_published'
     ordering = ['date_published']
 
 admin.site.register(Category)
