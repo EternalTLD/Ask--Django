@@ -4,11 +4,34 @@
 {% load bootstrap5 %}
 
 {% block content %}
-<h3 class="mt-5 text-uppercase">{{question.title}}</h3>
-<div class="col-10">
-  <div class="col-10 mt-3">
-    <img src="{% static 'images/avatars/hamster.jpg' %}" alt="static/images/avatrs/hamster.jpg" class="avatar-pic">
+  <h3 class="mt-5 text-uppercase">{{question.title}}</h3>
+  <div class="col-10">
+    <div class="col-10 mt-3">
+      <img src="{% static 'images/avatars/hamster.jpg' %}" alt="static/images/avatrs/hamster.jpg" class="avatar-pic">
+    </div>
   </div>
 
-</div>
+  <form method="post" action="{% url 'questions:question_detail' question.pk question.slug %}">
+    {{ form.as_p }}
+    {% csrf_token %}
+    <p><input type="submit" value="Add answer"></p>
+   </form>
+   
+
+  {% with answers.count as total_answers %}
+    <h2>
+      {{ total_answers }} comment{{ total_answers|pluralize }}
+    </h2>
+  {% endwith %}
+
+  {% for answer in answers %}
+    <div class="comment">
+      <p class="info">
+        {{answer.published}}
+      </p>
+      {{ answer.content|linebreaks }}
+    </div>
+    {% empty %}
+      <p>There are no comments.</p>
+  {% endfor %}
 {% endblock %}
