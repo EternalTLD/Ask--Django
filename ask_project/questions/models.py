@@ -110,9 +110,9 @@ class Answer(models.Model):
     active = models.BooleanField(default=True, verbose_name='Активный')
 
     class Meta:
-        ordering = ['-likes', 'date_published']
+        ordering = ['likes', '-date_published']
         indexes = [
-            models.Index(fields=['-likes', 'date_published'])
+            models.Index(fields=['likes', '-date_published'])
         ]
         verbose_name = 'Ответ'
         verbose_name_plural = 'Ответы'

@@ -34,7 +34,7 @@ class QuestionsByTagView(View):
         return render(request, 'questions/by_tag.html', context)
 
 class QuestionDetailView(DetailView):
-    #template_name = 'questions/question_detail.html'
+    template_name = 'questions/question_detail.html'
     model = Question
     context_object_name = 'question'
 
