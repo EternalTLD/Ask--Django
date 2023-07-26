@@ -2,9 +2,9 @@ from django.db import models
 from django.db.models.query import QuerySet
 from django.urls import reverse
 from django.utils import timezone
-from django.contrib.auth import get_user_model
+from taggit.managers import TaggableManager
 
-User = get_user_model()
+from users.models import User
 
 class Category(models.Model):
     """Categories"""
@@ -21,21 +21,6 @@ class Category(models.Model):
     
     def get_absolute_url(self):
         return reverse('questions:by_category', kwargs={'slug': self.slug})
-
-class Tag(models.Model):
-    """Tags"""
-    title = models.CharField(max_length=20, unique=True, verbose_name='Тег')
-    slug = models.SlugField(max_length=160, unique=True, default=title)
-
-    class Meta:
-        verbose_name = 'Тег'
-        verbose_name_plural = 'Теги'
-    
-    def __str__(self) -> str:
-        return self.title
-    
-    def get_absolute_url(self):
-        return reverse('questions:by_tag', kwargs={'slug': self.slug})
     
 class PublishedMnanger(models.Manager):
     def get_queryset(self) -> QuerySet:
@@ -56,11 +41,6 @@ class Question(models.Model):
         related_name= 'questions', 
         verbose_name='Автор',
     )
-    tags = models.ManyToManyField(
-        Tag, 
-        verbose_name='Теги',
-        related_name='questions',
-    )
     date_published = models.DateTimeField(default=timezone.now, verbose_name='Дата публикации')
     date_created = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     date_updated = models.DateTimeField(auto_now=True, verbose_name='Дата изменения')
@@ -73,6 +53,7 @@ class Question(models.Model):
 
     objects = models.Manager()
     published = PublishedMnanger()
+    tags = TaggableManager()
 
     class Meta:
         ordering = ['-date_published']

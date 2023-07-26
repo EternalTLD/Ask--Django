@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'bootstrap5',
     'questions.apps.QuestionsConfig',
     'users.apps.UsersConfig',
+    'taggit',
 ]
 
 MIDDLEWARE = [
@@ -69,7 +70,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'questions.middlewares.category_context_processor',
-                'questions.middlewares.tag_context_processor',
             ],
         },
     },

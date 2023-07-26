@@ -1,14 +1,19 @@
 from typing import Any
+from django.db.models.query import QuerySet
+from django.utils.text import slugify
 from django.urls import reverse
-from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
+from django.http import HttpRequest, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.contrib.auth import get_user_model
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import View
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, CreateView
 
-from .models import Question, Category, Tag, Answer
-from .forms import AnswerForm
+from .models import Question, Category, Answer
+from .forms import AnswerForm, QuestionForm
+
+User = get_user_model()
 
 
 class QuestionListView(ListView):
@@ -24,14 +29,6 @@ class QuestionsByCategoryView(View):
         questions = get_list_or_404(Question.published.filter(category__slug=slug))
         context = {'question_list': questions, 'category': category}
         return render(request, 'questions/by_category.html', context)
-    
-class QuestionsByTagView(View):
-
-    def get(self, request, slug):
-        tag = get_object_or_404(Tag, slug=slug)
-        questions = get_list_or_404(Question.published.filter(tags__title=tag))
-        context = {'question_list': questions, 'tag': tag}
-        return render(request, 'questions/by_tag.html', context)
 
 class QuestionDetailView(DetailView):
     template_name = 'questions/question_detail.html'
@@ -71,3 +68,22 @@ class QuestionView(View):
         if form.is_valid():
             form.save()
         return view(request, *args, **kwargs)
+    
+class NewQuestionView(CreateView):
+    template_name = 'questions/question_form.html'
+    success_url = '/'
+    form_class = QuestionForm
+
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
+        if not request.user.is_authenticated:
+            return HttpResponseForbidden()
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data.get('title')
+            print(title)
+            form.instance.slug = slugify(title)
+            form.instance.author_id = request.user.id
+            form.save()
+        return HttpResponseRedirect(reverse('questions:home'))
+    
+    

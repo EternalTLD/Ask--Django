@@ -6,13 +6,10 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 
 class User(AbstractUser):
 
-    username_validator = UnicodeUsernameValidator()
-
     username = models.CharField(
         max_length=25,
         unique=True,
         help_text=('Не более 25-ти символов. Буквы, цифры и @/./+/-/_ символы.'),
-        validators=[username_validator],
         error_messages={
             'unique': 'Пользователь с таким именем уже существует.'
         },
