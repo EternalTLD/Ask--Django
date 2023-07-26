@@ -9,6 +9,7 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.base import View
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormView, CreateView
+from taggit.models import Tag
 
 from .models import Question, Category, Answer
 from .forms import AnswerForm, QuestionForm
@@ -22,13 +23,29 @@ class QuestionListView(ListView):
     context_object_name = 'question_list'
     paginate_by = 3
 
-class QuestionsByCategoryView(View):
+class QuestionsByTagView(ListView):
+    template_name = 'questions/by_tag.html'
+    queryset = Question.published.all()
+    context_object_name = 'question_list'
+    paginate_by = 3
+     
+    def get_queryset(self) -> QuerySet[Any]:
+        tag_slug = self.kwargs.get('tag_slug')
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        question_list = get_list_or_404(Question.published.filter(tags__in=[tag]))
+        return question_list
+    
+class QuestionsByCategoryView(ListView):
+    template_name = 'questions/by_category.html'
+    queryset = Question.published.all()
+    context_object_name = 'question_list'
+    paginate_by = 3
 
-    def get(self, request, slug):
-        category = get_object_or_404(Category, slug=slug)
-        questions = get_list_or_404(Question.published.filter(category__slug=slug))
-        context = {'question_list': questions, 'category': category}
-        return render(request, 'questions/by_category.html', context)
+    def get_queryset(self) -> QuerySet[Any]:
+        category_slug = self.kwargs.get('category_slug')
+        question_list = get_list_or_404(Question.published.filter(category__slug=category_slug))
+        return question_list
+
 
 class QuestionDetailView(DetailView):
     template_name = 'questions/question_detail.html'
@@ -63,9 +80,9 @@ class QuestionView(View):
     def post(self, request, *args, **kwargs):
         view = AnswerFormView.as_view()
         form = AnswerForm(request.POST)
-        form.instance.author_id = request.user.id
-        form.instance.question = Question.objects.get(id=self.kwargs['id'])
         if form.is_valid():
+            form.instance.author_id = request.user.id
+            form.instance.question = Question.objects.get(id=self.kwargs['id'])
             form.save()
         return view(request, *args, **kwargs)
     
@@ -80,7 +97,6 @@ class NewQuestionView(CreateView):
         form = QuestionForm(request.POST)
         if form.is_valid():
             title = form.cleaned_data.get('title')
-            print(title)
             form.instance.slug = slugify(title)
             form.instance.author_id = request.user.id
             form.save()

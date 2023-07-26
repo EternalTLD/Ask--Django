@@ -20,7 +20,7 @@ class Category(models.Model):
         return self.name
     
     def get_absolute_url(self):
-        return reverse('questions:by_category', kwargs={'slug': self.slug})
+        return reverse('questions:by_category', kwargs={'category_slug': self.slug})
     
 class PublishedMnanger(models.Manager):
     def get_queryset(self) -> QuerySet:
