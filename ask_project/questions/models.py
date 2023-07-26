@@ -22,7 +22,7 @@ class Category(models.Model):
     def get_absolute_url(self):
         return reverse('questions:by_category', kwargs={'category_slug': self.slug})
     
-class PublishedMnanger(models.Manager):
+class PublishedManager(models.Manager):
     def get_queryset(self) -> QuerySet:
         return super().get_queryset().filter(draft=False)
 
@@ -52,7 +52,7 @@ class Question(models.Model):
     slug = models.SlugField(max_length=25)
 
     objects = models.Manager()
-    published = PublishedMnanger()
+    published = PublishedManager()
     tags = TaggableManager()
 
     class Meta:
