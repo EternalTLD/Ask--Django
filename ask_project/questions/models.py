@@ -47,7 +47,7 @@ class Question(models.Model):
     content = models.TextField(verbose_name='Содержание')
     likes = models.IntegerField(default=0, verbose_name='Лайки')
     dislikes = models.IntegerField(default=0, verbose_name='Дизлайки')
-    viewes = models.IntegerField(default=0, verbose_name='Просмотры')
+    views = models.IntegerField(default=0, verbose_name='Просмотры')
     draft = models.BooleanField(default=False, verbose_name='Черновик')
     slug = models.SlugField(max_length=25)
 

@@ -64,6 +64,16 @@
             </li>
             {% endfor %}
           </ul>
+
+          <h2 class="mt-3 p-3 border bg-light rounded">Popular questions today</h2>
+          {% get_todays_popular_questions as popular_questions %}
+          <ul>
+            {% for question in popular_questions %}
+            <li>
+              <a href="{{ question.get_absolute_url }}" class="href">{{ question.title }}</a>
+            </li>
+            {% endfor %}
+          </ul>
         </div>
       </div>
       </div>
