@@ -1,5 +1,6 @@
 from typing import Any
 from django.db.models.query import QuerySet
+from django.db.models import Count
 from django.utils.text import slugify
 from django.urls import reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
@@ -57,6 +58,12 @@ class QuestionDetailView(DetailView):
         context['form'] = AnswerForm()
         question = self.get_object()
         context['answers'] = question.answers.filter(active=True)
+
+        #similar questions by same tags
+        question_tags_ids = question.tags.values_list('id', flat=True)
+        similar_questions = Question.published.filter(tags__in=question_tags_ids).exclude(id=question.id)
+        similar_questions = similar_questions.annotate(same_tags=Count('tags')).order_by('-same_tags', '-date_published')[:4]
+        context['similar_questions'] = similar_questions
         return context
     
 class AnswerFormView(SingleObjectMixin, FormView):

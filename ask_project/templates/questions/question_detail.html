@@ -39,4 +39,13 @@
       <p>There are no comments.</p>
   </hr>
   {% endfor %}
+
+  Схожие вопросы:
+  {% for question in similar_questions %}
+    <p>
+      <a href="{{ question.get_absolute_url }}" class="href">{{ question.title }}</a>
+    </p>
+    {% empty %}
+    There are no similar posts yet.
+  {% endfor %}
 {% endblock %}
