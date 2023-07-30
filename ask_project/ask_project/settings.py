@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'questions.apps.QuestionsConfig',
     'users.apps.UsersConfig',
     'taggit',
+    'django.contrib.postgres',
 ]
 
 MIDDLEWARE = [

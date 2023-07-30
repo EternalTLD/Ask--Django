@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.contrib.auth import get_user_model
+from django.contrib.postgres.search import TrigramSimilarity
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import View
 from django.views.generic.detail import SingleObjectMixin
@@ -13,7 +14,7 @@ from django.views.generic.edit import FormView, CreateView
 from taggit.models import Tag
 
 from .models import Question, Category, Answer
-from .forms import AnswerForm, QuestionForm
+from .forms import AnswerForm, QuestionForm, SearchForm
 
 User = get_user_model()
 
@@ -109,4 +110,18 @@ class NewQuestionView(CreateView):
             form.save()
         return HttpResponseRedirect(reverse('questions:home'))
     
+def question_search_view(request):
+    form = SearchForm()
+    query = None
+    results = []
+
+    if 'query' in request.GET:
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            query = form.cleaned_data.get('query')
+            results = Question.published.annotate(
+                similarity=TrigramSimilarity('title', query)
+            ).filter(similarity__gt=0.1).order_by('-similarity')
     
+    return render(request, 'questions/search.html', context={'form': form, 'query': query, 'results': results})
+

@@ -4,6 +4,7 @@ from .views import *
 app_name = 'questions'
 
 urlpatterns = [
+    path('search/', question_search_view, name='question_search'),
     path('tags/<slug:tag_slug>', QuestionsByTagView.as_view(), name='by_tag'),
     path('categories/<slug:category_slug>', QuestionsByCategoryView.as_view(), name='by_category'),
     path('new_question/', NewQuestionView.as_view(), name='new_question'),
