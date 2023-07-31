@@ -6,6 +6,7 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.generic.edit import CreateView
 from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.decorators import login_required
 
 from .models import User
 from .forms import UserRegistrationForm
@@ -41,9 +42,6 @@ class UserRegistrationView(CreateView):
 class UserLoginView(LoginView):
     redirect_authenticated_user = True
     template_name = 'users/login.html'
-
-    def get_success_url(self):
-        return reverse_lazy('questions:home')
     
     def form_invalid(self, form):
         messages.error(self.request, 'Неправильный email или пароль.')
@@ -52,3 +50,6 @@ class UserLoginView(LoginView):
 class UserLogoutView(LogoutView):
     template_name = 'users/logout.html'
 
+@login_required
+def dashboard(request):
+    return render(request, 'users/dashboard.html', {'section': 'dashboard'})
