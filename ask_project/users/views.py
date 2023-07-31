@@ -49,7 +49,3 @@ class UserLoginView(LoginView):
 
 class UserLogoutView(LogoutView):
     template_name = 'users/logout.html'
-
-@login_required
-def dashboard(request):
-    return render(request, 'users/dashboard.html', {'section': 'dashboard'})
