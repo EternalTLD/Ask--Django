@@ -74,8 +74,6 @@ class AnswerFormView(SingleObjectMixin, FormView):
     success_url = '#'
 
     def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return HttpResponseForbidden()
         self.object = self.get_queryset()
         return super().post(request, *args, **kwargs)
     
@@ -87,6 +85,8 @@ class QuestionView(View):
     
     def post(self, request, *args, **kwargs):
         view = AnswerFormView.as_view()
+        if not request.user.is_authenticated:
+            return HttpResponseForbidden()
         form = AnswerForm(request.POST)
         if form.is_valid():
             form.instance.author_id = request.user.id
