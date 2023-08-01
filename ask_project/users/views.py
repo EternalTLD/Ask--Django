@@ -38,14 +38,3 @@ class UserRegistrationView(CreateView):
         else:
             print(user_form.errors)
             return render(request, 'users/registration.html', context={'form': user_form})
-
-class UserLoginView(LoginView):
-    redirect_authenticated_user = True
-    template_name = 'users/login.html'
-    
-    def form_invalid(self, form):
-        messages.error(self.request, 'Неправильный email или пароль.')
-        return self.render_to_response(self.get_context_data(form=form))
-
-class UserLogoutView(LogoutView):
-    template_name = 'users/logout.html'
