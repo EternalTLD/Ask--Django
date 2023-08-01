@@ -34,7 +34,7 @@ class UserRegistrationView(CreateView):
             user.set_password(password)
             user.save()
             messages.success(request, 'Регистрация прошла успешно!')
-            return redirect('users:login')
+            return render(request, 'users/registration_done.html', context={'user': user})
         else:
             print(user_form.errors)
             return render(request, 'users/registration.html', context={'form': user_form})

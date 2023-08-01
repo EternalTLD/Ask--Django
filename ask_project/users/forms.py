@@ -29,6 +29,13 @@ class UserRegistrationForm(UserCreationForm):
             raise forms.ValidationError('Имя пользователя не должно содержать пробелы.')
         return username
     
+    def clean_password2(self) -> str:
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+        if password1 != password2:
+            raise forms.ValidationError('Пароли не совпадают!')
+        return password2
+    
     def save(self, commit=True):
         user = super(UserCreationForm, self).save(commit=False)
         user.username = self.cleaned_data['username']
