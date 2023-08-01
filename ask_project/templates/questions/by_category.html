@@ -1,4 +1,4 @@
-{% extends "layout/basic.html" %}
+{% extends "layout/side_menu.html" %}
 
 {% load static %}
 {% load bootstrap5 %}
@@ -16,7 +16,9 @@
     {% for question in question_list %}
     <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
         <div class="col p-4 d-flex flex-column position-static">
-            <strong class="d-inline-block mb-1 text-success">{{ question.category.name }}</strong>
+            <strong class="d-inline-block mb-1 text-success">
+                <a href="{{ question.category.get_absolute_url }}" class="href">{{ question.category.name }}</a>
+            </strong>
             <h3 class="mb-1"><a href="{{ question.get_absolute_url }}" class="href">{{ question.title }}</a></h3>
             <div class="mb-1 text-muted">
                 Author: <a href="{{ question.author.get_absolute_url }}">{{ question.author }}</a>
