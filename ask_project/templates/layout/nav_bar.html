@@ -43,8 +43,14 @@
       </div>
     </nav>
   </header>
-  {% block content %}
-  {% endblock %}
+  <main class="flex-shrink-0">
+    <div class="container">
+      <div class="row">
+        {% block content %}
+        {% endblock %}
+      </div>
+    </div>
+  </main>    
   <footer class="footer mt-auto py-3 bg-light">
     <div class="container">
       <span class="text-muted">Place sticky footer content here.</span>
