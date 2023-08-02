@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'bootstrap5',
     'questions.apps.QuestionsConfig',
     'users.apps.UsersConfig',
+    'profiles.apps.ProfilesConfig',
     'taggit',
     'django.contrib.postgres',
 ]
