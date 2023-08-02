@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 
 from .models import User
 from .forms import UserRegistrationForm
+from profiles.models import Profile
 
 
 class UserRegistrationView(CreateView):
@@ -29,6 +30,7 @@ class UserRegistrationView(CreateView):
             password = user_form.cleaned_data.get('password1')
             user.set_password(password)
             user.save()
+            Profile.objects.create(user=user)
             messages.success(request, 'Регистрация прошла успешно!')
             return render(request, 'users/registration_done.html', context={'user': user})
         else:
