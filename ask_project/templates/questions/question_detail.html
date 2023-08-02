@@ -5,11 +5,7 @@
 
 {% block content %}
   <h3 class="mt-5 text-uppercase">{{question.title}}</h3>
-  <div class="col-10">
-    <div class="col-10 mt-3">
-      <img src="{% static 'images/avatars/hamster.jpg' %}" alt="static/images/avatrs/hamster.jpg" class="avatar-pic">
-    </div>
-  </div>
+  <p><a href="{% url 'profiles:profile_detail' question.author.username %}" class="href">{{question.author}}</a></p>
 
   <form method="post" action="{% url 'questions:question_detail' question.pk question.slug %}">
     {{ form.as_p }}

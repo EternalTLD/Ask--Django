@@ -21,7 +21,7 @@
         <div class="col p-4 d-flex flex-column position-static">
             <h3 class="mb-1"><a href="{{ question.get_absolute_url }}" class="href">{{ question.title }}</a></h3>
             <div class="mb-1 text-muted">
-                Author: <a href="{{ question.author.get_absolute_url }}">{{ question.author }}</a>
+                Author: <a href="{% url 'profiles:profile_detail' question.author.username %}">{{ question.author }}</a>
                 <div>{{ question.date_published }}</div>
             </div>
             <p class="mb-1 mt-1">{{ question.content }}</p>
