@@ -9,6 +9,7 @@ class Profile(models.Model):
     rating = models.IntegerField(default=0, verbose_name='Рейтинг')
     city = models.CharField(max_length=25, blank=True, verbose_name='Город')
     country = models.CharField(max_length=25, blank=True, verbose_name='Страна')
+    status = models.CharField(max_length=250, blank=True, verbose_name='Статус')
 
     class Meta:
         verbose_name = 'Профиль'
