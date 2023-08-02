@@ -1,0 +1,13 @@
+{% extends 'layout/nav_bar.html' %}
+
+{% load static %}
+{% load bootstrap5 %}
+
+{% block content %}
+<form method="post" action="{% url 'profiles:profile_edit' %}">
+    {{ user_form.as_p }}
+    {{ profile_form.as_p }}
+    {% csrf_token %}
+    <p><input type="submit" value="edit"></p>
+</form>
+{% endblock%}
