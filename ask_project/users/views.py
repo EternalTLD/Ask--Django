@@ -22,10 +22,6 @@ class UserRegistrationView(CreateView):
         return self.success_url
     
     def post(self, request, *args, **kwargs):
-        if User.objects.filter(email=request.POST['username']):
-            messages.warning(request, 'Пользователь уже зарегистрирован')
-            return redirect('users:registration')
-
         user_form = UserRegistrationForm(request.POST)
 
         if user_form.is_valid():

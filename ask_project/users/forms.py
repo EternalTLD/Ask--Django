@@ -27,8 +27,16 @@ class UserRegistrationForm(UserCreationForm):
         username = self.cleaned_data['username']
         if ' ' in username:
             raise forms.ValidationError('Имя пользователя не должно содержать пробелы.')
+        if User.objects.filter(username=username):
+            raise forms.ValidationError('Пользователь с таким никнеймом уже зарегистрирован.')
         return username
     
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email):
+            raise forms.ValidationError('Пользователь с таким email-адресом уже зарегистрирован.')
+        return email
+
     def clean_password2(self) -> str:
         password1 = self.cleaned_data.get('password1')
         password2 = self.cleaned_data.get('password2')
