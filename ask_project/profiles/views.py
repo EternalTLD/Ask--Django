@@ -1,7 +1,15 @@
 from django.shortcuts import render
+from django.views.generic.detail import DetailView
 
 from .forms import UserEditForm, ProfileEditForm
+from users.models import User
 
+class ProfileDetailView(DetailView):
+    template_name = 'profiles/profile_detail.html'
+    model = User
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+    context_object_name = 'user'
 
 def profile_edit_view(request):
 
