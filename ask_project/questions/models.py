@@ -5,22 +5,6 @@ from django.utils import timezone
 from taggit.managers import TaggableManager
 
 from users.models import User
-
-class Category(models.Model):
-    """Categories"""
-    name = models.CharField(max_length=50, unique=True, verbose_name='Категория')
-    image = models.ImageField(null=True, upload_to='categories/', verbose_name='Картинка')
-    slug = models.SlugField(max_length=160, unique=True)
-
-    class Meta:
-        verbose_name = 'Категория'
-        verbose_name_plural = 'Категории'
-
-    def __str__(self) -> str:
-        return self.name
-    
-    def get_absolute_url(self):
-        return reverse('questions:by_category', kwargs={'category_slug': self.slug})
     
 class PublishedManager(models.Manager):
     def get_queryset(self) -> QuerySet:
@@ -29,12 +13,6 @@ class PublishedManager(models.Manager):
 class Question(models.Model):
     """Questions"""
     title = models.CharField(max_length=25, verbose_name='Заголовок')
-    category = models.ForeignKey(
-        Category, 
-        on_delete=models.PROTECT,
-        related_name='questions', 
-        verbose_name='Категория', 
-    )
     author = models.ForeignKey(
         User, 
         on_delete=models.CASCADE,

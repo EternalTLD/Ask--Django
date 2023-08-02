@@ -13,7 +13,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormView, CreateView
 from taggit.models import Tag
 
-from .models import Question, Category, Answer
+from .models import Question, Answer
 from .forms import AnswerForm, QuestionForm, SearchForm
 
 User = get_user_model()
@@ -36,18 +36,6 @@ class QuestionsByTagView(ListView):
         tag = get_object_or_404(Tag, slug=tag_slug)
         question_list = get_list_or_404(Question.published.filter(tags__in=[tag]))
         return question_list
-    
-class QuestionsByCategoryView(ListView):
-    template_name = 'questions/by_category.html'
-    queryset = Question.published.all()
-    context_object_name = 'question_list'
-    paginate_by = 3
-
-    def get_queryset(self) -> QuerySet[Any]:
-        category_slug = self.kwargs.get('category_slug')
-        question_list = get_list_or_404(Question.published.filter(category__slug=category_slug))
-        return question_list
-
 
 class QuestionDetailView(DetailView):
     template_name = 'questions/question_detail.html'

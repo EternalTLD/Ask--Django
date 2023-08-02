@@ -6,7 +6,7 @@ class QuestionForm(forms.ModelForm):
 
     class Meta:
         model = Question
-        fields = ['title', 'category', 'tags' ,'content', 'draft']
+        fields = ['title', 'tags' ,'content', 'draft']
 
 class AnswerForm(forms.ModelForm):
     

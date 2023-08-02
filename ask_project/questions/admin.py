@@ -1,11 +1,11 @@
 from django.contrib import admin
-from .models import Category, Question, Answer, QuestionImages
+from .models import Question, Answer, QuestionImages
 
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ['title', 'category', 'author', 'date_published', 'draft']
-    list_filter = ['draft', 'category', 'date_published', 'date_created', 'author']
+    list_display = ['title', 'author', 'date_published', 'draft']
+    list_filter = ['draft', 'date_published', 'date_created', 'author']
     search_fields = ['title', 'content']
     prepopulated_fields = {'slug': ('title',)}
     raw_id_fields = ['author']
@@ -19,5 +19,4 @@ class AnswerAdmin(admin.ModelAdmin):
     search_fields = ['question', 'content']
     ordering = ['date_published']
 
-admin.site.register(Category)
 admin.site.register(QuestionImages)
