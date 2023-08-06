@@ -69,6 +69,12 @@ class QuestionView(View):
     
     def get(self, request, *args, **kwargs):
         view = QuestionDetailView.as_view()
+        question_id = self.kwargs.get('id')
+        question = Question.objects.filter(pk=question_id)
+        current_views = question.values()[0]['views']
+        current_views += 1
+        print(current_views)
+        question.update(views=current_views)
         return view(request, *args, **kwargs)
     
     def post(self, request, *args, **kwargs):
