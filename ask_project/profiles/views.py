@@ -2,6 +2,7 @@ from typing import Any, Dict
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
 
 from .forms import UserEditForm, ProfileEditForm
 from users.models import User
@@ -28,7 +29,12 @@ class ProfileDetailView(DetailView):
         page = self.request.GET.get('page')
         page_obj = paginator.get_page(page)
         return page_obj
-
+    
+class TopUsersListView(ListView):
+    model = User
+    template_name = 'profiles/user_list.html'
+    context_object_name = 'user_list'
+    queryset = User.objects.order_by('-profile__rating')[:10]
 
 def profile_edit_view(request):
 
