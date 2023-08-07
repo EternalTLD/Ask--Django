@@ -1,0 +1,17 @@
+{% extends "layout/nav_bar.html" %}
+
+{% load static %}
+{% load bootstrap5 %}
+
+{% block content %}
+<div class="col-10">
+  <span>
+      <h2 class="mt-3 p-3 border bg-light rounded">Logout succesfully</h2>
+  </span>
+  <span>
+    <h2 class="mt-3 p-3 border bg-light rounded">
+      <a href="{% url 'users:login' %}" class="href">Войти снова</a>
+    </h2>
+  </span>
+</div>
+{% endblock %}
