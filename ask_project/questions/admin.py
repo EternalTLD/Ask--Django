@@ -1,9 +1,13 @@
 from django.contrib import admin
-from .models import Question, Answer, QuestionImages
+from .models import Question, Answer, QuestionImages, QuestionVote, AnswerVote
 
+
+class QuestionVotesAdmin(admin.TabularInline):
+    model = QuestionVote
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
+    inlines = [QuestionVotesAdmin]
     list_display = ['title', 'author', 'date_published', 'draft']
     list_filter = ['draft', 'date_published', 'date_created', 'author']
     search_fields = ['title', 'content']
@@ -12,8 +16,12 @@ class QuestionAdmin(admin.ModelAdmin):
     date_hierarchy = 'date_published'
     ordering = ['-draft', 'date_published']
 
+class AnswerVotesAdmin(admin.TabularInline):
+    model = AnswerVote
+
 @admin.register(Answer)
 class AnswerAdmin(admin.ModelAdmin):
+    inlines = [AnswerVotesAdmin]
     list_display = ['question', 'author', 'date_published', 'best_answer', 'active']
     list_filter = ['question', 'author', 'date_published', 'best_answer', 'active']
     search_fields = ['question', 'content']
