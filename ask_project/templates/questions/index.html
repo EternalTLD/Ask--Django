@@ -28,8 +28,8 @@
 
             <span>
                 <h5 class="mt-2 text-muted">Rating: 7</h5>
-                <button type="button" class="btn btn-outline-success" data-mdb-ripple-color="dark">Like</button>
-                <button type="button" class="btn btn-outline-danger" data-mdb-ripple-color="dark">Dislike</button>
+                <a href="{% url 'questions:question_vote' 'like' question.pk %}" class="href">like</a>
+                <a href="{% url 'questions:question_vote' 'dislike' question.pk %}" class="href">dislike</a>
             </span>
             <span>tags: 
                 {% for tag in question.tags.all %}

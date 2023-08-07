@@ -13,7 +13,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormView, CreateView
 from taggit.models import Tag
 
-from .models import Question, Answer
+from .models import Question, Answer, QuestionVote, AnswerVote
 from .forms import AnswerForm, QuestionForm, SearchForm
 
 User = get_user_model()
@@ -119,3 +119,22 @@ def question_search_view(request):
     
     return render(request, 'questions/search.html', context={'form': form, 'query': query, 'results': results})
 
+def add_question_vote_view(request, action, id):
+    user = request.user
+    question = Question.objects.filter(pk=id).first()
+    if user in question.votes.all():
+        if action == 'like':
+            question.votes.remove(user)
+            question.votes.add(user, through_defaults={'vote': 1})
+        elif action == 'dislike':
+            question.votes.remove(user)
+            question.votes.add(user, through_defaults={'vote': -1})
+    else:
+        if action == 'like':
+            question.votes.add(user, through_defaults={'vote': 1})
+        elif action == 'dislike':
+            question.votes.add(user, through_defaults={'vote': -1})
+    return HttpResponseRedirect(reverse('questions:home'))
+
+def add_answer_vote_view(request):
+    pass
