@@ -2,10 +2,13 @@
 
 {% load static %}
 {% load bootstrap5 %}
+{% load questions_tags %}
 
 {% block content %}
   <h3 class="mt-5 text-uppercase">{{question.title}}</h3>
   <p><a href="{% url 'profiles:profile_detail' question.author.username %}" class="href">{{question.author}}</a></p>
+  <h5 class="mt-5 text-uppercase">Likes: {{question.pk|count_question_likes}}</h5>
+  <h5 class="mt-5 text-uppercase">Dislikes: {{question.pk|count_question_dislikes}}</h5>
 
   <form method="post" action="{% url 'questions:question_detail' question.pk question.slug %}">
     {{ form.as_p }}
@@ -29,15 +32,17 @@
       <p class="info">
         Автор - {{answer.author}}
       </p>
+      <h5 class="mt-5 text-uppercase">Likes: {{answer.pk|count_answer_likes}}</h5>
+      <h5 class="mt-5 text-uppercase">Dislikes: {{answer.pk|count_answer_dislikes}}</h5>
       {{ answer.content|linebreaks }}
       <form method="post" action="{% url 'questions:answer_like' answer.pk %}">
         {% csrf_token %}
         <p><input type="submit" value="Like"></p>
-    </form>
-    <form method="post" action="{% url 'questions:answer_dislike' answer.pk %}">
+      </form>
+      <form method="post" action="{% url 'questions:answer_dislike' answer.pk %}">
         {% csrf_token %}
         <p><input type="submit" value="Dislike"></p>
-    </form>
+      </form>
     </div>
     {% empty %}
       <p>There are no comments.</p>

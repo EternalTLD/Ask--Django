@@ -2,6 +2,7 @@
 
 {% load static %}
 {% load bootstrap5 %}
+{% load questions_tags %}
 
 {% block content %}
 <div class="col-11">
@@ -27,7 +28,8 @@
             <p class="mb-1 mt-1">{{ question.content }}</p>
 
             <span>
-                <h5 class="mt-2 text-muted">Rating: 7</h5>
+                <h5 class="mt-2 text-muted">Likes: {{ question.pk|count_question_likes }} </h5>
+                <h5 class="mt-2 text-muted">Dislikes: {{ question.pk|count_question_dislikes }} </h5>
                 <form method="post" action="{% url 'questions:question_like' question.pk %}">
                     {% csrf_token %}
                     <p><input type="submit" value="Like"></p>
