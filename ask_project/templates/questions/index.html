@@ -28,8 +28,14 @@
 
             <span>
                 <h5 class="mt-2 text-muted">Rating: 7</h5>
-                <a href="{% url 'questions:question_vote' 'like' question.pk %}" class="href">like</a>
-                <a href="{% url 'questions:question_vote' 'dislike' question.pk %}" class="href">dislike</a>
+                <form method="post" action="{% url 'questions:question_like' question.pk %}">
+                    {% csrf_token %}
+                    <p><input type="submit" value="Like"></p>
+                </form>
+                <form method="post" action="{% url 'questions:question_dislike' question.pk %}">
+                    {% csrf_token %}
+                    <p><input type="submit" value="Dislike"></p>
+                </form>
             </span>
             <span>tags: 
                 {% for tag in question.tags.all %}

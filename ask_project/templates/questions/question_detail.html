@@ -30,6 +30,14 @@
         Автор - {{answer.author}}
       </p>
       {{ answer.content|linebreaks }}
+      <form method="post" action="{% url 'questions:answer_like' answer.pk %}">
+        {% csrf_token %}
+        <p><input type="submit" value="Like"></p>
+    </form>
+    <form method="post" action="{% url 'questions:answer_dislike' answer.pk %}">
+        {% csrf_token %}
+        <p><input type="submit" value="Dislike"></p>
+    </form>
     </div>
     {% empty %}
       <p>There are no comments.</p>
