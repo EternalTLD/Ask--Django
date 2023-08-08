@@ -69,7 +69,7 @@ class QuestionView(View):
     
     def get(self, request, *args, **kwargs):
         view = QuestionDetailView.as_view()
-        question_id = self.kwargs.get('id')
+        question_id = self.kwargs.get('pk')
         question = Question.objects.filter(pk=question_id)
         current_views = question.values()[0]['views']
         current_views += 1
@@ -118,23 +118,23 @@ def question_search_view(request):
             ).filter(similarity__gt=0.1).order_by('-similarity')
     
     return render(request, 'questions/search.html', context={'form': form, 'query': query, 'results': results})
+    
+class VoteView(View):
+    model = None
+    vote_model = None
+    vote_type = None
 
-def add_question_vote_view(request, action, id):
-    user = request.user
-    question = Question.objects.filter(pk=id).first()
-    if user in question.votes.all():
-        if action == 'like':
-            question.votes.remove(user)
-            question.votes.add(user, through_defaults={'vote': 1})
-        elif action == 'dislike':
-            question.votes.remove(user)
-            question.votes.add(user, through_defaults={'vote': -1})
-    else:
-        if action == 'like':
-            question.votes.add(user, through_defaults={'vote': 1})
-        elif action == 'dislike':
-            question.votes.add(user, through_defaults={'vote': -1})
-    return HttpResponseRedirect(reverse('questions:home'))
+    def post(self, request, pk):
+        obj = self.model.objects.get(pk=pk)
 
-def add_answer_vote_view(request):
-    pass
+        try:
+            vote_object = self.vote_model.objects.get(user=request.user, obj=obj)
+            if vote_object.vote is not self.vote_type:
+                vote_object.vote = self.vote_type
+                vote_object.save(update_fields=['vote'])
+            else:
+                vote_object.delete()
+        except Exception:
+            obj.votes.add(request.user, through_defaults={'vote': self.vote_type})
+
+        return HttpResponseRedirect(reverse('questions:home'))
