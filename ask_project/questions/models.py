@@ -21,7 +21,7 @@ class QuestionVote(models.Model):
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    question = models.ForeignKey('Question', on_delete=models.CASCADE)
+    obj = models.ForeignKey('Question', on_delete=models.CASCADE)
     vote = models.SmallIntegerField(choices=VOTES, verbose_name='Голос')
     voted_at = models.DateTimeField(auto_now_add=True)
 
@@ -69,7 +69,7 @@ class Question(models.Model):
         return self.title
     
     def get_absolute_url(self):
-        return reverse('questions:question_detail', kwargs={'id': self.pk, 'slug': self.slug})
+        return reverse('questions:question_detail', kwargs={'pk': self.pk, 'slug': self.slug})
     
 class QuestionImages(models.Model):
     """Additional images"""
@@ -90,7 +90,7 @@ class AnswerVote(models.Model):
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    answer = models.ForeignKey('Answer', on_delete=models.CASCADE)
+    obj = models.ForeignKey('Answer', on_delete=models.CASCADE)
     vote = models.SmallIntegerField(choices=VOTES, verbose_name='Голос')
     voted_at = models.DateTimeField(auto_now_add=True)
     
