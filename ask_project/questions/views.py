@@ -71,9 +71,7 @@ class QuestionView(View):
         view = QuestionDetailView.as_view()
         question_id = self.kwargs.get('pk')
         question = Question.objects.filter(pk=question_id)
-        current_views = question.values()[0]['views']
-        current_views += 1
-        print(current_views)
+        current_views = question.values()[0]['views'] + 1
         question.update(views=current_views)
         return view(request, *args, **kwargs)
     
@@ -84,7 +82,7 @@ class QuestionView(View):
         form = AnswerForm(request.POST)
         if form.is_valid():
             form.instance.author_id = request.user.id
-            form.instance.question = Question.objects.get(id=self.kwargs['id'])
+            form.instance.question = Question.objects.get(id=self.kwargs['pk'])
             form.save()
         return view(request, *args, **kwargs)
     
@@ -103,22 +101,7 @@ class NewQuestionView(CreateView):
             form.instance.author_id = request.user.id
             form.save()
         return HttpResponseRedirect(reverse('questions:home'))
-    
-def question_search_view(request):
-    form = SearchForm()
-    query = None
-    results = []
 
-    if 'query' in request.GET:
-        form = SearchForm(request.GET)
-        if form.is_valid():
-            query = form.cleaned_data.get('query')
-            results = Question.published.annotate(
-                similarity=TrigramSimilarity('title', query)
-            ).filter(similarity__gt=0.1).order_by('-similarity')
-    
-    return render(request, 'questions/search.html', context={'form': form, 'query': query, 'results': results})
-    
 class VoteView(View):
     model = None
     vote_model = None
@@ -137,4 +120,19 @@ class VoteView(View):
         except Exception:
             obj.votes.add(request.user, through_defaults={'vote': self.vote_type})
 
-        return HttpResponseRedirect(reverse('questions:home'))
+        return HttpResponseRedirect(reverse('questions:home'))    
+    
+def question_search_view(request):
+    form = SearchForm()
+    query = None
+    results = []
+
+    if 'query' in request.GET:
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            query = form.cleaned_data.get('query')
+            results = Question.published.annotate(
+                similarity=TrigramSimilarity('title', query)
+            ).filter(similarity__gt=0.1).order_by('-similarity')
+    
+    return render(request, 'questions/search.html', context={'form': form, 'query': query, 'results': results})
