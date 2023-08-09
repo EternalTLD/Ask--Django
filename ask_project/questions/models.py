@@ -71,6 +71,9 @@ class Question(models.Model):
     def get_absolute_url(self):
         return reverse('questions:question_detail', kwargs={'pk': self.pk, 'slug': self.slug})
     
+    def get_update_url(self):
+        return reverse('questions:question_update', kwargs={'pk': self.pk, 'slug': self.slug})
+    
 class QuestionImages(models.Model):
     """Additional images"""
     question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='Вопрос')

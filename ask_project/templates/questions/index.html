@@ -26,7 +26,7 @@
                 <div>{{ question.date_published }}</div>
             </div>
             <p class="mb-1 mt-1">{{ question.content }}</p>
-
+            <a href="{{ question.get_update_url }}" class="href">Update</a>
             <span>
                 <h5 class="mt-2 text-muted">Likes: {{ question.pk|count_question_likes }} </h5>
                 <h5 class="mt-2 text-muted">Dislikes: {{ question.pk|count_question_dislikes }} </h5>

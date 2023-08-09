@@ -10,7 +10,7 @@ from django.contrib.postgres.search import TrigramSimilarity
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import View
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import FormView, CreateView
+from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
 from taggit.models import Tag
 
 from .models import Question, Answer, QuestionVote, AnswerVote
@@ -101,6 +101,15 @@ class NewQuestionView(CreateView):
             form.instance.author_id = request.user.id
             form.save()
         return HttpResponseRedirect(reverse('questions:home'))
+
+class UpdateQuestionView(UpdateView):
+    model = Question
+    form_class = QuestionForm
+    template_name = 'questions/question_form.html'
+    
+    def get_success_url(self) -> str:
+        question = self.get_object()
+        return reverse('questions:question_detail', kwargs={'pk': question.pk, 'slug': question.slug})
 
 class VoteView(View):
     model = None
