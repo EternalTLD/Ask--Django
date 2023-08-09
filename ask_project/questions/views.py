@@ -86,8 +86,8 @@ class QuestionView(View):
             form.save()
         return view(request, *args, **kwargs)
     
-class NewQuestionView(CreateView):
-    template_name = 'questions/question_form.html'
+class QuestionCreateView(CreateView):
+    template_name = 'questions/question_create_form.html'
     success_url = '/'
     form_class = QuestionForm
 

@@ -6,7 +6,7 @@ app_name = 'questions'
 urlpatterns = [
     path('search/', question_search_view, name='question_search'),
     path('tags/<slug:tag_slug>/', QuestionsByTagView.as_view(), name='by_tag'),
-    path('new_question/', NewQuestionView.as_view(), name='new_question'),
+    path('question/create/', QuestionCreateView.as_view(), name='question_create'),
     path(
         'question/like/<int:pk>/', 
         VoteView.as_view(
