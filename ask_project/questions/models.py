@@ -72,7 +72,10 @@ class Question(models.Model):
         return reverse('questions:question_detail', kwargs={'pk': self.pk, 'slug': self.slug})
     
     def get_update_url(self):
-        return reverse('questions:question_update', kwargs={'pk': self.pk, 'slug': self.slug})
+        return reverse('questions:question_update', kwargs={'pk': self.pk})
+    
+    def get_delete_url(self):
+        return reverse('questions:question_delete', kwargs={'pk': self.pk})
     
 class QuestionImages(models.Model):
     """Additional images"""

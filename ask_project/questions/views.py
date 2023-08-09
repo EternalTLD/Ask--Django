@@ -102,13 +102,18 @@ class NewQuestionView(CreateView):
             form.save()
         return HttpResponseRedirect(reverse('questions:home'))
 
-class UpdateQuestionView(UpdateView):
+class QuestionUpdateView(UpdateView):
     model = Question
     form_class = QuestionForm
     template_name = 'questions/question_update_form.html'
     
     def get_success_url(self) -> str:
         return self.get_object().get_absolute_url()
+    
+class QuestionDeleteView(DeleteView):
+    model = Question
+    success_url = '/'
+    
 
 class VoteView(View):
     model = None

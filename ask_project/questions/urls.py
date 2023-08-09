@@ -44,6 +44,7 @@ urlpatterns = [
         name='answer_dislike'
     ),
     path('<int:pk>/<slug:slug>/', QuestionView.as_view(), name='question_detail'),
-    path('update/<int:pk>/<slug:slug>/', UpdateQuestionView.as_view(), name="question_update"),
+    path('update/<int:pk>/', QuestionUpdateView.as_view(), name="question_update"),
+    path('delete/<int:pk>/', QuestionDeleteView.as_view(), name='question_delete'),
     path('', QuestionListView.as_view(), name='home'),
 ]

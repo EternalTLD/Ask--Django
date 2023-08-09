@@ -1,0 +1,18 @@
+{% extends "layout/nav_bar.html" %}
+
+{% load static %}
+{% load bootstrap5 %}
+
+{% block content %}
+<div class="col-10">
+    <span>
+        <h2 class="mt-3 p-3 border bg-light rounded"><a>Delete question</a></h2>
+    </span>
+</div>
+
+<form method="post" action="{{question.get_delete_url}}">
+    Delete {{ object }}?
+    {% csrf_token %}
+    <p><input type="submit" value="Confirm"></p>
+   </form>
+{% endblock %}
