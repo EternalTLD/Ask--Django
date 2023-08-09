@@ -105,11 +105,10 @@ class NewQuestionView(CreateView):
 class UpdateQuestionView(UpdateView):
     model = Question
     form_class = QuestionForm
-    template_name = 'questions/question_form.html'
+    template_name = 'questions/question_update_form.html'
     
     def get_success_url(self) -> str:
-        question = self.get_object()
-        return reverse('questions:question_detail', kwargs={'pk': question.pk, 'slug': question.slug})
+        return self.get_object().get_absolute_url()
 
 class VoteView(View):
     model = None
