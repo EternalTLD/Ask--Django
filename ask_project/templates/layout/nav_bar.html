@@ -21,25 +21,25 @@
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation"></button>
           <span class="navbar-toggler-icon"></span>
         <div class="collapse navbar-collapse" id="navbarCollapse">
-          <form class="d-flex">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+          <form class="d-flex" action="{% url 'questions:question_search' %}" method="get">
+            <input class="form-control me-2" name="query" type="query" placeholder="Search" aria-label="Search">
             <button class="btn btn-outline-success" type="submit">Search</button>
           </form>
           <ul class="navbar-nav me-auto mb-2 mb-md-0">
             {% if request.user.is_authenticated %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'profiles:profile_detail' request.user.username %}">Profile</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'users:logout' %}">Logout</a>
-            </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'profiles:profile_detail' request.user.username %}">Profile</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'users:logout' %}">Logout</a>
+              </li>
             {% else %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'users:registration' %}">Registration</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'users:login' %}">Login</a>
-            </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'users:registration' %}">Registration</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'users:login' %}">Login</a>
+              </li>
             {% endif %}
           </ul>
         </div>

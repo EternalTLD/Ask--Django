@@ -20,7 +20,6 @@
         {% empty %}
         Вопросов нет
         {% endfor %}
-        <p><a href="{% url 'questions:question_search'%}" class="href">Искать заново</a></p>
     {% else %}
      <h1>Найти вопрос</h1>
      <form method="get">

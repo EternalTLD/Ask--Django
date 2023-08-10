@@ -31,7 +31,7 @@
     </div>
 </div>
 -->
-<form method="post" action="{% url 'questions:new_question' %}">
+<form method="post" action="{% url 'questions:question_create' %}">
     {{ form.as_p }}
     {% csrf_token %}
     <p><input type="submit" value="Add question"></p>
