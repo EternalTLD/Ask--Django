@@ -5,7 +5,7 @@ from users.models import User
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    profile_image = models.ImageField(upload_to='avatars/', blank=True, verbose_name='аватар')
+    profile_image = models.ImageField(upload_to='avatars/%Y/%m/%d/', blank=True, null=True, verbose_name='Аватар')
     rating = models.IntegerField(default=0, verbose_name='Рейтинг')
     city = models.CharField(max_length=25, blank=True, verbose_name='Город')
     country = models.CharField(max_length=25, blank=True, verbose_name='Страна')
