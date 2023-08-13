@@ -10,7 +10,7 @@
     </span>
 </div>
 
-<form method="post" action="{{question.get_delete_url}}">
+<form method="post" action="{% url 'questions:question_delete' question.pk %}">
     Delete {{ object }}?
     {% csrf_token %}
     <p><input type="submit" value="Confirm"></p>
