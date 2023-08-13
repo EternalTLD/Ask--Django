@@ -71,16 +71,10 @@ class Question(models.Model):
     def get_absolute_url(self):
         return reverse('questions:question_detail', kwargs={'pk': self.pk, 'slug': self.slug})
     
-    def get_update_url(self):
-        return reverse('questions:question_update', kwargs={'pk': self.pk})
-    
-    def get_delete_url(self):
-        return reverse('questions:question_delete', kwargs={'pk': self.pk})
-    
 class QuestionImages(models.Model):
     """Additional images"""
     question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='Вопрос')
-    image = models.ImageField(blank=True, upload_to='questions_images/', verbose_name='Картинка')
+    image = models.ImageField(blank=True, upload_to='questions_images/%Y/%m/%d/', verbose_name='Картинка')
 
     class Meta:
         verbose_name = 'Картинка к вопросу'
@@ -140,7 +134,7 @@ class Answer(models.Model):
 class AnswerImages(models.Model):
     """Additional images"""
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE, verbose_name='Ответ')
-    image = models.ImageField(blank=True, null=True, upload_to='questions_images/', verbose_name='Картинка')
+    image = models.ImageField(blank=True, null=True, upload_to='answers_images/%Y/%m/%d/', verbose_name='Картинка')
 
     class Meta:
         verbose_name = 'Картинка к ответу'

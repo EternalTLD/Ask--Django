@@ -71,8 +71,8 @@ class QuestionView(View):
         view = QuestionDetailView.as_view()
         question_id = self.kwargs.get('pk')
         question = Question.objects.filter(pk=question_id)
-        current_views = question.values()[0]['views'] + 1
-        question.update(views=current_views)
+        views = question.values()[0]['views'] + 1
+        question.update(views=views)
         return view(request, *args, **kwargs)
     
     def post(self, request, *args, **kwargs):
@@ -106,6 +106,7 @@ class QuestionUpdateView(UpdateView):
     model = Question
     form_class = QuestionForm
     template_name = 'questions/question_update_form.html'
+    context_object_name = 'question'
     
     def get_success_url(self) -> str:
         return self.get_object().get_absolute_url()
@@ -113,6 +114,7 @@ class QuestionUpdateView(UpdateView):
 class QuestionDeleteView(DeleteView):
     model = Question
     success_url = '/'
+    context_object_name = 'question'
     
 
 class VoteView(View):
