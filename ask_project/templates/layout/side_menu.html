@@ -8,6 +8,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+ 
   <title>ASK.FM - {% block title %}Главная{% endblock %}</title>
   {% bootstrap_css %}
 </head>
@@ -58,16 +59,18 @@
       <!-- Tags -->
       <div class="col-3">
       <div class="position-fixed">
-        <h2 class="mt-3 p-3 border bg-light rounded">Popular tags</h2>
+        <span>
+          <h2 class="mt-3 p-3 border bg-light rounded">
+            <a>Popular tags</a>
+          </h2>
+        </span>
         {% get_popular_tags as popular_tags %}
-        <ul>
-          {% for tag in popular_tags %}
-          <li>
-            <a href="{% url 'questions:by_tag' tag.slug %}" class="href">{{ tag.name }}</a>
-          </li>
-          {% endfor %}
-        </ul>
-
+          <span>
+            {% for tag in popular_tags %}
+                <a href="{% url 'questions:by_tag' tag.slug %}" class="href">{{ tag.name }}</a>
+                {% if not forloop.last %}, {% endif %}
+            {% endfor %}
+          </span>
         <h2 class="mt-3 p-3 border bg-light rounded">Popular questions today</h2>
         {% get_todays_popular_questions as popular_questions %}
         <ul>
