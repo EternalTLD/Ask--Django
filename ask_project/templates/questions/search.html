@@ -1,9 +1,7 @@
-{% extends 'layout/side_menu.html' %}
-
 {% load static %}
 {% load bootstrap5 %}
 
-{% block content %}
+{% include "layout/nav_bar.html" %}
     {% if query %}
         <h1>Вопросы, содержащие {{ query }}</h1>
         <h3>
@@ -26,4 +24,3 @@
         {{ form.as_p }}
      </form>
     {% endif %}
-{% endblock %}

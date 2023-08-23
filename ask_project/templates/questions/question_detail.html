@@ -1,10 +1,8 @@
-{% extends "layout/nav_bar.html" %}
-
-{% load static %}
-{% load bootstrap5 %}
+{% extends 'layout/base.html' %}
 {% load questions_tags %}
 
 {% block content %}
+<div class="col-9">
   <h3 class="mt-5 text-uppercase">{{question.title}}</h3>
   <p><a href="{% url 'profiles:profile_detail' question.author.username %}" class="href">{{question.author}}</a></p>
   <h5 class="mt-5 text-uppercase">Likes: {{question.pk|count_question_likes}}</h5>
@@ -14,47 +12,12 @@
     {{ form.as_p }}
     {% csrf_token %}
     <p><input type="submit" value="Add answer"></p>
-   </form>
-   
+  </form>
+    
+  {% include 'layout/answers.html' with answers=answers %}
+</div>
 
-  {% with answers.count as total_answers %}
-    <h2>
-      {{ total_answers }} answer{{ total_answers|pluralize }}
-    </h2>
-  {% endwith %}
-
-  {% for answer in answers %}
-  <hr>
-    <div class="comment">
-      <p class="info">
-        Дата публикации - {{answer.date_published}}
-      </p>
-      <p class="info">
-        Автор - {{answer.author}}
-      </p>
-      <h5 class="mt-5 text-uppercase">Likes: {{answer.pk|count_answer_likes}}</h5>
-      <h5 class="mt-5 text-uppercase">Dislikes: {{answer.pk|count_answer_dislikes}}</h5>
-      {{ answer.content|linebreaks }}
-      <form method="post" action="{% url 'questions:answer_like' answer.pk %}">
-        {% csrf_token %}
-        <p><input type="submit" value="Like"></p>
-      </form>
-      <form method="post" action="{% url 'questions:answer_dislike' answer.pk %}">
-        {% csrf_token %}
-        <p><input type="submit" value="Dislike"></p>
-      </form>
-    </div>
-    {% empty %}
-      <p>There are no comments.</p>
-  </hr>
-  {% endfor %}
-
-  Схожие вопросы:
-  {% for question in similar_questions %}
-    <p>
-      <a href="{{ question.get_absolute_url }}" class="href">{{ question.title }}</a>
-    </p>
-    {% empty %}
-    There are no similar posts yet.
-  {% endfor %}
+<div class="col-3">
+  {% include 'layout/questions_side_menu.html' with questions=similar_questions %}
+</div>
 {% endblock %}

@@ -1,18 +1,11 @@
-{% extends "layout/nav_bar.html" %}
-
-{% load static %}
-{% load bootstrap5 %}
+{% extends 'layout/base.html' %}
 
 {% block content %}
-<div class="col-10">
-    <span>
-        <h2 class="mt-3 p-3 border bg-light rounded"><a>Delete question</a></h2>
-    </span>
-</div>
+<h2 class="mt-3 p-3 border bg-light rounded"><a>Delete question</a></h2>
 
 <form method="post" action="{% url 'questions:question_delete' question.pk %}">
     Delete {{ object }}?
     {% csrf_token %}
     <p><input type="submit" value="Confirm"></p>
-   </form>
+</form>
 {% endblock %}

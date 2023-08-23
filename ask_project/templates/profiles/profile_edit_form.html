@@ -1,7 +1,4 @@
-{% extends 'layout/nav_bar.html' %}
-
-{% load static %}
-{% load bootstrap5 %}
+{% extends 'layout/base.html' %}
 
 {% block content %}
 <form method="post" enctype="multipart/form-data" action="{% url 'profiles:profile_edit' %}">
@@ -10,4 +7,4 @@
     {% csrf_token %}
     <p><input type="submit" value="edit"></p>
 </form>
-{% endblock%}
+{% endblock %}
