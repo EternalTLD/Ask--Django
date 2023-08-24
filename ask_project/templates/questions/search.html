@@ -1,26 +1,22 @@
-{% load static %}
-{% load bootstrap5 %}
+{% extends 'layout/base.html' %}
 
-{% include "layout/nav_bar.html" %}
-    {% if query %}
-        <h1>Вопросы, содержащие {{ query }}</h1>
-        <h3>
+{% block content %}
+<div class="col-9">
+    <h2 class="mt-3 p-3 border bg-light rounded">
+        {% with results.count as total_results %}
+            Найдено вопросов {{ total_results }}
+        {% endwith %}
+        <button onclick="location.href=('{% url 'questions:question_create' %}')" type="button" class="btn btn-success " data-mdb-ripple-color="dark">Ask</button>
+    </h2>
+    {% include 'layout/questions.html' with questions=results %}
+</div>
+<div class="col-3">
+    <div class="position-fixed">
+        <h2 class="mt-3 p-3 border text-light bg-secondary rounded text-center" style="max-width: 20rem;">
             {% with results.count as total_results %}
-                Найдено вопросов {{ total_results }}
+                Найдено тегов {{ total_results }}
             {% endwith %}
-        </h3>
-        {% for question in results %}
-        <h4>
-            <a href="{{ question.get_absolute_url }}" class="href">
-                {{ question.title }}
-            </a>
-        </h4>
-        {% empty %}
-        Вопросов нет
-        {% endfor %}
-    {% else %}
-     <h1>Найти вопрос</h1>
-     <form method="get">
-        {{ form.as_p }}
-     </form>
-    {% endif %}
+        </h2>
+    </div>
+</div>
+{% endblock %}

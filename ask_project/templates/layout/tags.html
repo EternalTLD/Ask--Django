@@ -1,6 +1,6 @@
 {% load questions_tags %}
 <div class="position-fixed">
-    <h2 class="mt-3 p-3 border text-light bg-secondary rounded text-center" style="max-width: 20rem;">Популярные теги</h2>
+    <h2 class="mt-3 p-3 border text-light bg-secondary rounded text-center" style="width: 20rem;">Популярные теги</h2>
     <div class="p-3 border text-light bg-light rounded" style="max-width: 20rem;">
         {% get_popular_tags as popular_tags %}
             {% for tag in popular_tags %}
