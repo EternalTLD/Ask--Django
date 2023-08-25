@@ -14,7 +14,7 @@
     <div class="row">
       <div class="col-md-6 mb-4">
         <label class="control-label">Имя</label>
-        <input class="form-control" value="{{ form.first_name.value|default_if_none:'' }}" name="First name" placeholder="" type="text">
+        <input class="form-control" value="{{ form.first_name.value|default_if_none:'' }}" name="first_name" placeholder="" type="text">
         {% if 'first_name' in form.errors %}
             {% for error in form.first_name.errors %}
               <div class="alert alert-danger alert-dismissable">
@@ -27,7 +27,7 @@
 
       <div class="col-md-6 mb-4">
         <label class="control-label">Фамилия</label>
-        <input class="form-control" value="{{ form.last_name.value|default_if_none:'' }}" name="Last name" placeholder="" type="text">
+        <input class="form-control" value="{{ form.last_name.value|default_if_none:'' }}" name="last_name" placeholder="" type="text">
         {% if 'last_name' in form.errors %}
             {% for error in form.last_name.errors %}
               <div class="alert alert-danger alert-dismissable">

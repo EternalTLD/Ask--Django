@@ -7,16 +7,11 @@ from .models import User
 
 class UserRegistrationForm(UserCreationForm):
      
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['username'].widget.attrs.update({'placeholder': 'Введите имя пользователя.'})
-        self.fields['email'].widget.attrs.update({'placeholder': 'Введите email.'})
-        self.fields['password1'].widget.attrs.update({'placeholder': 'Введите пароль.'})
-        self.fields['password2'].widget.attrs.update({'placeholder': 'Повторите пароль.'})
-
     class Meta:
         model = User
         fields = (
+            'first_name',
+            'last_name',
             'username',
             'email',
             'password1',
@@ -44,8 +39,12 @@ class UserRegistrationForm(UserCreationForm):
     
     def save(self, commit=True):
         user = super(UserCreationForm, self).save(commit=False)
-        user.username = self.cleaned_data['username']
-        user.email = self.cleaned_data['email']
+        user.first_name = self.cleaned_data.get('first_name').capitalize()
+        user.last_name = self.cleaned_data.get('last_name').capitalize()
+        user.username = self.cleaned_data.get('username')
+        user.email = self.cleaned_data.get('email')
+        password = self.cleaned_data.get('password1')
+        user.set_password(password)
         if commit:
             user.save()
         return user
