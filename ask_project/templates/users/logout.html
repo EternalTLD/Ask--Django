@@ -1,12 +1,15 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
-<span>
-  <h2 class="mt-3 p-3 border bg-light rounded">Logout succesfully</h2>
-</span>
-<span>
-  <h2 class="mt-3 p-3 border bg-light rounded">
-    <a href="{% url 'users:login' %}" class="href">Войти снова</a>
-  </h2>
-</span>
+<div class="col-4"></div>
+
+<div class="mt-3 mb-3 p-3 col-4 rounded border border-1 border-primary row g-0 overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+  <h2 class="text-center">Вы вышли из аккаунта</h2>
+  <hr class="border border-2 border-primary">
+    <form action="{% url 'users:login' %}">
+      <div class="d-flex justify-content-center pt-3">
+        <button type="submit" class="btn btn-primary btn-lg ms-2">Войти снова</button>
+      </div>
+    </form>
+</div>
 {% endblock %}

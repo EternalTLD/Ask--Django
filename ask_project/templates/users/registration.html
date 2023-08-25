@@ -1,21 +1,20 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
-<div class="col-10">
-  <span>
-      <h2 class="mt-3 p-3 border bg-light rounded"><a>Create new account</a></h2>
-  </span>
-</div>
 
-<div class="col-10 mt-3">
+<div class="col-3"></div>
+
+<div class="mt-3 mb-3 p-3 col-6 rounded border border-1 border-primary row g-0 overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+  <h2 class="text-center">Регистрация</h2>
+  <hr class="border border-2 border-primary">
   <form method="POST" action="{% url 'users:registration' %}">
 
     {% csrf_token %}
 
     <div class="row">
       <div class="col-md-6 mb-4">
-        <label class="control-label">First name</label>
-        <input class="form-control" value="{{ form.first_name.value|default_if_none:"" }}" name="First name" placeholder="" type="text">
+        <label class="control-label">Имя</label>
+        <input class="form-control" value="{{ form.first_name.value|default_if_none:'' }}" name="First name" placeholder="" type="text">
         {% if 'first_name' in form.errors %}
             {% for error in form.first_name.errors %}
               <div class="alert alert-danger alert-dismissable">
@@ -27,8 +26,8 @@
       </div>
 
       <div class="col-md-6 mb-4">
-        <label class="control-label">Last name</label>
-        <input class="form-control" value="{{ form.last_name.value|default_if_none:"" }}" name="Last name" placeholder="" type="text">
+        <label class="control-label">Фамилия</label>
+        <input class="form-control" value="{{ form.last_name.value|default_if_none:'' }}" name="Last name" placeholder="" type="text">
         {% if 'last_name' in form.errors %}
             {% for error in form.last_name.errors %}
               <div class="alert alert-danger alert-dismissable">
@@ -41,8 +40,8 @@
     </div>
 
     <div class="form-outline mb-4">
-      <label class="control-label">Username</label>
-      <input class="form-control" value="{{ form.username.value|default_if_none:"" }}" name="username" placeholder="" type="text">
+      <label class="control-label">Никнейм</label>
+      <input class="form-control" value="{{ form.username.value|default_if_none:'' }}" name="username" placeholder="" type="text">
       {% if 'username' in form.errors %}
           {% for error in form.username.errors %}
             <div class="alert alert-danger alert-dismissable">
@@ -54,8 +53,8 @@
     </div>
       
     <div class="form-outline mb-4">
-      <label class="control-label">Your Email</label>
-      <input class="form-control" value="{{ form.email.value|default_if_none:"" }}" name="email" placeholder="" type="email">
+      <label class="control-label">Email</label>
+      <input class="form-control" value="{{ form.email.value|default_if_none:'' }}" name="email" placeholder="" type="email">
       {% if 'email' in form.errors %}
         {% for error in form.email.errors %}
           <div class="alert alert-danger alert-dismissable">
@@ -67,7 +66,7 @@
     </div>
       
     <div class="form-outline mb-4">
-      <label class="control-label">Password</label>
+      <label class="control-label">Пароль</label>
       <input class="form-control" name="password1" placeholder="" type="password">
       {% if 'password1' in form.errors %}
         {% for error in form.password1.errors %}
@@ -80,7 +79,7 @@
     </div>
       
     <div class="form-outline mb-4">
-      <label class="control-label">Confirm Password</label>
+      <label class="control-label">Повторите пароль</label>
       <input class="form-control" name="password2" placeholder="" type="password">
       {% if 'password2' in form.errors %}
         {% for error in form.password2.errors %}
@@ -98,7 +97,7 @@
       <label class="form-label" for="form3Example90">Upload avatar</label>
     -->
     <div class="d-flex justify-content-end pt-3">
-      <button type="submit" class="btn btn-warning btn-lg ms-2" value="Complete Registration!">Create</button>
+      <button type="submit" class="btn btn-primary btn-lg ms-2" value="Complete Registration!">Зарегистрироваться</button>
     </div>
   </form>
   
