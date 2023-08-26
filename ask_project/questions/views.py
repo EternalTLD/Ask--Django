@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 from django.db.models.query import QuerySet
 from django.db.models import Count
 from django.utils.text import slugify
@@ -13,29 +13,43 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
 from taggit.models import Tag
 
-from .models import Question, Answer, QuestionVote, AnswerVote
+from .models import Question, Answer
 from .forms import AnswerForm, QuestionForm, SearchForm
 
 User = get_user_model()
 
 
-class QuestionListView(ListView):
+class QuestionsListView(ListView):
     template_name = 'questions/index.html'
     queryset = Question.published.all()
-    context_object_name = 'question_list'
-    paginate_by = 3
+    context_object_name = 'questions_list'
+    paginate_by = 10
 
-class QuestionsByTagView(ListView):
-    template_name = 'questions/by_tag.html'
-    queryset = Question.published.all()
-    context_object_name = 'question_list'
-    paginate_by = 3
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Последние вопросы'
+        return context
+
+class QuestionsByTagListView(QuestionsListView):
      
     def get_queryset(self) -> QuerySet[Any]:
         tag_slug = self.kwargs.get('tag_slug')
         tag = get_object_or_404(Tag, slug=tag_slug)
-        question_list = get_list_or_404(Question.published.filter(tags__in=[tag]))
-        return question_list
+        questions_list = get_list_or_404(Question.published.filter(tags__in=[tag]))
+        return questions_list
+    
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = f"Вопросы с тегом {self.kwargs.get('tag_slug')}"
+        return context
+    
+class PopularQuestionsListView(QuestionsListView):
+    queryset = Question.published.order_by('-views', '-votes')
+    
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = 'Популярные вопросы'
+        return context
 
 class QuestionDetailView(DetailView):
     template_name = 'questions/question_detail.html'
