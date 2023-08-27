@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'questions.apps.QuestionsConfig',
     'users.apps.UsersConfig',
     'profiles.apps.ProfilesConfig',
+    'notifications.apps.NotificationsConfig',
     'taggit',
     'django.contrib.postgres',
 ]
