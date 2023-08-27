@@ -2,11 +2,11 @@
 
 {% block content %}
 <div class="col-9">
-    <h2 class="mt-3 p-3 border bg-light rounded">
-        <a>Последние вопросы</a>
+    <h2 class="mt-3 p-3 border bg-light bg-gradient rounded">
+        <a>{{ page_title }}</a>
         <button style="float: right;" onclick="location.href=('{% url 'questions:question_create' %}')" type="button" class="btn btn-primary" data-mdb-ripple-color="dark">Задать вопрос</button>
     </h2>
-    {% include 'layout/questions.html' with questions=question_list %}
+    {% include 'layout/questions.html' with questions=questions_list %}
 </div>
 <div class="col-3">
     {% include 'layout/tags.html' %}          

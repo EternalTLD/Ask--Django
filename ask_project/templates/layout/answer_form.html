@@ -1,4 +1,4 @@
-<div class="card-footer py-3 border-0" style="background-color: #d6d6d6;">
+<div class="card-footer py-3 border-0">
     <div class="d-flex flex-start w-100">
 
       <img class="rounded-circle shadow-1-strong me-3"
@@ -10,10 +10,9 @@
         <form action="{% url 'questions:question_detail' question.pk question.slug %}" method="post">
             {% csrf_token %}
             <textarea name="content" class="form-control" id="content" rows="4"
-            style="background: #fff;"></textarea>
-            <label class="form-label" for="textAreaExample">Message</label>
+            style="background: #fff;" placeholder="Введите ответ..."></textarea>
             <div class="float-end mt-2 pt-1">
-                <button type="submit" class="btn btn-primary btn-sm">Post comment</button>
+                <button type="submit" class="btn btn-primary rounded btn-sm">Ответить</button>
             </div>
         </form>
 

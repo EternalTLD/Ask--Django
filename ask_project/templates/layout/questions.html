@@ -1,59 +1,55 @@
-{% load static %}
-{% load bootstrap5 %}
 {% load questions_tags %}
 
 {% for question in questions %}
 <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-    <div class="col-8 p-3 d-flex flex-column">
+    <div class="col-8 p-3 d-flex flex-column align-items-start bd-highlight mb-3">
 
-        <div class="d-flex align-items-start flex-column bd-highlight">
-
-            <div class="bd-highlight align-items-start" style="padding: .0rem .0rem .0rem 0.6rem ;">
-                <h3 class="mb-1"><a href="{{ question.get_absolute_url }}" class="href">{{ question.title }}</a></h3>
-                <div class="mb-1 text-muted">
-                    <div>{{ question.date_published }}</div>
-                </div>
-                <p class="mb-1 mt-1">{{ question.content }}</p>
+        <div class="mb-auto d-flex flex-column bd-highlight" style="padding: .0rem .0rem .0rem 0.6rem ;">
+            <h3 class="mb-1"><a href="{{ question.get_absolute_url }}" class="href">{{ question.title }}</a></h3>
+            <div class="mb-1 text-muted">
+                <div>Опубликовано - {{ question.date_published }}</div>
             </div>
-
-            <div class="bd-highlight align-items-end">
-                <div class="d-flex flex-row justify-content-left">
-                    <div class="d-flex align-items-start" style="padding: .9rem 0rem .0rem .0rem;">
-                        <form method="post" action="{% url 'questions:question_like' question.pk %}">
-                            {% csrf_token %}
-                            <button class="btn" id="green"><i class="fa fa-thumbs-up fa-lg" aria-hidden="true"> {{ question.pk|count_question_likes }}</i></button>
-                        </form>
-                    </div>
-                    <div class="d-flex align-items-start" style="padding: .9rem 0rem .0rem .0rem;">
-                        <form method="post" action="{% url 'questions:question_dislike' question.pk %}">
-                            {% csrf_token %}
-                            <button class="btn" id="red"><i class="fa fa-thumbs-down fa-lg" aria-hidden="true"> {{ question.pk|count_question_dislikes }}</i></button>
-                        </form>
-                    </div>
-                </div>
-                <div class="d-flex flex-row justify-content-left">
-                    {% for tag in question.tags.all %}
-                    <div class="d-flex align-items-start" style="padding: .8rem .2rem .0rem .6rem;">
-                        <form action="{% url 'questions:by_tag' tag.slug %}">
-                            <button class="btn btn-outline-primary" type="submit" data-mdb-ripple-color="dark" style="padding: .15rem .5rem .1rem; float: left;">
-                                {{ tag.name }}
-                            </button>
-                        </form>
-                    </div>
-                    {% endfor %}
-                </div>
+            <div class="d-flex flex-column">
+                {{ question.content }}
             </div>
-
         </div>
+
+        <div class="bd-highlight">
+            <div class="d-flex flex-row justify-content-left">
+                <div class="d-flex align-items-start" style="padding: .9rem 0rem .0rem .0rem;">
+                    <form method="post" action="{% url 'questions:question_like' question.pk %}">
+                        {% csrf_token %}
+                        <button class="btn" id="green"><i class="fa fa-thumbs-up fa-lg" aria-hidden="true"> {{ question.pk|count_question_likes }}</i></button>
+                    </form>
+                </div>
+                <div class="d-flex align-items-start" style="padding: .9rem 0rem .0rem .0rem;">
+                    <form method="post" action="{% url 'questions:question_dislike' question.pk %}">
+                        {% csrf_token %}
+                        <button class="btn" id="red"><i class="fa fa-thumbs-down fa-lg" aria-hidden="true"> {{ question.pk|count_question_dislikes }}</i></button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="d-flex flex-row justify-content-left">
+                {% for tag in question.tags.all %}
+                <div class="d-flex align-items-start" style="padding: .8rem .2rem .0rem .6rem;">
+                    <form action="{% url 'questions:by_tag' tag.slug %}">
+                        <button class="btn btn-outline-primary" type="submit" data-mdb-ripple-color="dark" style="padding: .15rem .5rem .1rem; float: left;">
+                            {{ tag.name }}
+                        </button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
 
     </div>
 
     <div class="col-4">
         <div class="p-3 d-flex flex-column justify-content-center border bg-light">
             <div class="p-2 d-flex justify-content-center">
-                <img class="rounded-circle"
-                    src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(19).webp" alt="avatar" width="200"
-                    height="200" />
+                <img class="rounded-circle" src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(19).webp" alt="avatar" width="200" height="200">
             </div>
             <a class="list-group-item list-group-item-action text-center rounded" href="{% url 'profiles:profile_detail' question.author.username %}">{{ question.author.username }}</a>
         </div>

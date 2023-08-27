@@ -8,6 +8,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
   {% bootstrap_css %}
+  <script>
+    document.addEventListener( 'DOMContentLoaded', function () {
+      new Splide( '#image-slider' ).mount();
+    } );
+  </script>
 </head>
 
 <body>
