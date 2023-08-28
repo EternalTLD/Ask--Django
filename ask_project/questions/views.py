@@ -11,9 +11,11 @@ from django.views.generic import ListView, DetailView
 from django.views.generic.base import View
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
-from taggit.models import Tag
+from django.core.exceptions import ObjectDoesNotExist
 
+from taggit.models import Tag
 from .models import Question, Answer
+from notifications.models import Notification
 from .forms import AnswerForm, QuestionForm, SearchForm
 
 User = get_user_model()
@@ -95,9 +97,18 @@ class QuestionView(View):
             return HttpResponseForbidden()
         form = AnswerForm(request.POST)
         if form.is_valid():
+            question = Question.objects.get(id=self.kwargs['pk'])
             form.instance.author_id = request.user.id
-            form.instance.question = Question.objects.get(id=self.kwargs['pk'])
+            form.instance.question = question
             form.save()
+
+            # send notification to question author
+            Notification.objects.create(
+                from_user=request.user, 
+                to_user=question.author,
+                question=question,
+                type='AQ'
+            )
         return view(request, *args, **kwargs)
     
 class QuestionCreateView(CreateView):
@@ -137,19 +148,53 @@ class VoteView(View):
     vote_type = None
 
     def post(self, request, pk):
-        obj = self.model.objects.get(pk=pk)
+        vote_target = self.model.objects.get(pk=pk)
 
         try:
-            vote_object = self.vote_model.objects.get(user=request.user, obj=obj)
+            vote_object = self.vote_model.objects.get(user=request.user, vote_target=vote_target)
             if vote_object.vote is not self.vote_type:
                 vote_object.vote = self.vote_type
                 vote_object.save(update_fields=['vote'])
+                self.send_vote_notification(vote_target)
             else:
                 vote_object.delete()
-        except Exception:
-            obj.votes.add(request.user, through_defaults={'vote': self.vote_type})
+                self.delete_vote_notification(vote_target)
+        except ObjectDoesNotExist:
+            vote_target.votes.add(request.user, through_defaults={'vote': self.vote_type})
+            self.send_vote_notification(vote_target)
 
-        return HttpResponseRedirect(reverse('questions:home'))    
+        return HttpResponseRedirect(reverse('questions:home'))
+    
+    def send_vote_notification(self, vote_target):
+        Notification.objects.create(
+            from_user=self.request.user,
+            to_user=vote_target.author,
+            question=self.get_vote_target_question(vote_target),
+            type=self.get_notification_type(),
+        )
+
+    def delete_vote_notification(self, vote_target):
+        notification = get_object_or_404(
+            Notification,
+            from_user=self.request.user,
+            to_user=vote_target.author,
+            question=self.get_vote_target_question(vote_target),
+            type=self.get_notification_type(),
+        )
+        notification.delete()
+
+    def get_vote_target_question(self, vote_target):
+        if self.model is Question:
+            return vote_target
+        elif self.model is Answer:
+            return vote_target.question
+
+    def get_notification_type(self):
+        if self.vote_type == 1:
+            if self.model is Question:
+                return 'QL'
+            elif self.model is Answer:
+                return 'AL'
     
 def question_search_view(request):
     form = SearchForm()
