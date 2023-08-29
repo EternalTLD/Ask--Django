@@ -37,6 +37,9 @@
             <a class="nav-link d-flex flex-column text-center" aria-current="page" href="{% url 'profiles:profile_detail' request.user.username %}"><span class="small">Профиль</span></a>
           </li>
           <li class="nav-item">
+            <a class="nav-link d-flex flex-column text-center" aria-current="page" href="{% url 'notifications:unread' %}"><span class="small">Уведомления</span></a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link d-flex flex-column text-center" aria-current="page" href="{% url 'users:logout' %}"><span class="small">Выйти</span></a>
           </li>
         {% else %}

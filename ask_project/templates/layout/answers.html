@@ -6,8 +6,9 @@
     <div class="row d-flex justify-content-left">
         <div class="">
           <div class="card">
-
-            {% include 'layout/answer_form.html' with question=question %}
+            {% if request.user.is_authenticated %}
+                {% include 'layout/answer_form.html' with question=question %}
+            {% endif %}
 
             {% for answer in answers %}
             <div class="card-body border rounded">

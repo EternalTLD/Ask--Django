@@ -16,7 +16,7 @@
                     x
                 </div>
                 <div class="d-flex align-items-center text-dark">
-                    3000
+                    {{ tag.pk|count_taged_questions }}
                 </div>
             </div>
             {% endfor %}

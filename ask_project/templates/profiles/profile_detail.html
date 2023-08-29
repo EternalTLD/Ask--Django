@@ -1,42 +1,43 @@
 {% extends 'layout/base.html' %}
 
+{% load profiles_tags %}
+
 {% block content %}
 <div class="col-9">
     <h2 class="mt-3 p-3 border bg-light rounded">
         <a>Профиль пользователя {{ user.username }}</a>
     </h2>
-    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-        <div class="col-4 border bg-light">
+    <div class="row g-0 border bg-light rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+        <div class="col-4 bg-light">
             <div class="p-3 px-3 d-flex flex-column justify-content-center">
                 <div class="p-2 d-flex justify-content-center">
-                    <img class="rounded" src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(19).webp" alt="avatar" width="200" height="200" />
+                    <img class="rounded-circle" src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(19).webp" alt="avatar" width="210" height="210" />
                 </div>
-                <div class="p-2 d-flex justify-content-center border rounded">
-                    <h2>{{ user.username }}</h2>
+                <div class="p-2 d-flex justify-content-center rounded">
+                    <form action="{% url 'profiles:profile_edit' %}">
+                        <button class="btn btn-outline-primary" type="submit" data-mdb-ripple-color="dark">
+                            Редактировать
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
-        <div class="col-8">
-            <div class="p-1 px-3 d-flex flex-column">
+        <div class="col-8 align-self-center">
+            <div class="mb-5 d-flex flex-column align-items-center">
                 <div class="p-2 d-flex justify-content-left">
-                    <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+                    <h1>{{ user.first_name }} {{ user.last_name }}</h1>
                 </div>
                 <div class="p-1 d-flex justify-content-left">
-                    <h6>{{ user.profile.status }}</h6>
+                    <h5>{{ user.profile.status }}</h5>
                 </div>
                 <div class="p-1 d-flex justify-content-left">
                     <p>{{ user.profile.city }}, {{ user.profile.country }}</p>
-                </div>
-                <div class="p-1 d-flex justify-content-left">
-                    <p>Рейтинг: {{ user.profile.rating }}</p>
                 </div>
             </div>
         </div>
     </div>
     <h2 class="mt-3 p-3 border bg-light rounded">
         Список вопросов
-        <button type="button" class="btn btn-primary" data-mdb-ripple-color="dark" style="float: right;">Вопросы</button>
-        <button type="button" class="btn btn-primary" data-mdb-ripple-color="dark" style="float: right;">Уведомления</button>
     </h2>
     {% include 'layout/questions.html' with questions=user_questions %}
 </div>
@@ -47,13 +48,11 @@
         </h2>
         <div class="p-3 border text-light bg-light rounded" style="width: 20rem;">
             <ul class="list-group">
-                <li class="list-group-item list-group-item-primary">На сайте с 13 июля 2022 года</li>
-                <li class="list-group-item list-group-item-primary">Задано вопросов - 120</li>
-                <li class="list-group-item list-group-item-primary">Отправлено ответов - 120</li>
-                <li class="list-group-item list-group-item-primary">Рейтинг - 120</li>
-                <li class="list-group-item list-group-item-warning">Лучших ответов - 120</li>
-                <li class="list-group-item list-group-item-success">Получено лайков - 120</li>
-                <li class="list-group-item list-group-item-danger">Получено дизлайков - 120</li>
+                <li class="list-group-item list-group-item-primary">На сайте с {{ user.date_joined }}</li>
+                <li class="list-group-item list-group-item-primary">Задано вопросов - {{ user.pk|count_user_questions }}</li>
+                <li class="list-group-item list-group-item-primary">Отправлено ответов - {{ user.pk|count_user_answers }}</li>
+                <li class="list-group-item list-group-item-success">Получено лайков - {{ user.pk|count_user_recieved_likes }}</li>
+                <li class="list-group-item list-group-item-danger">Получено дизлайков - {{ user.pk|count_user_recieved_dislikes }}</li>
             </ul>
         </div>
     </div>

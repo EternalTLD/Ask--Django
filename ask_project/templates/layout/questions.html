@@ -1,7 +1,7 @@
 {% load questions_tags %}
 
 {% for question in questions %}
-<div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+<div class="row g-0 border bg-light rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
     <div class="col-8 p-3 d-flex flex-column align-items-start bd-highlight mb-3">
 
         <div class="mb-auto d-flex flex-column bd-highlight" style="padding: .0rem .0rem .0rem 0.6rem ;">
@@ -43,7 +43,6 @@
             </div>
         </div>
 
-
     </div>
 
     <div class="col-4">
@@ -54,8 +53,31 @@
             <a class="list-group-item list-group-item-action text-center rounded" href="{% url 'profiles:profile_detail' question.author.username %}">{{ question.author.username }}</a>
         </div>
     </div>
+
 </div>
 <script src="https://use.fontawesome.com/fe459689b4.js"></script>
+<script>
+    var btn1 = document.querySelector('#green');
+var btn2 = document.querySelector('#red');
+
+btn1.addEventListener('click', function() {
+  
+    if (btn2.classList.contains('red')) {
+      btn2.classList.remove('red');
+    } 
+  this.classList.toggle('green');
+  
+});
+
+btn2.addEventListener('click', function() {
+  
+    if (btn1.classList.contains('green')) {
+      btn1.classList.remove('green');
+    } 
+  this.classList.toggle('red');
+  
+});
+</script>
 
 {% empty %}
 Вопросов не найдено
