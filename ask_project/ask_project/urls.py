@@ -25,6 +25,7 @@ urlpatterns = [
     path('profiles/', include('profiles.urls', namespace='profiles')),
     path('notifications/', include('notifications.urls', namespace='notifications')),
     path('api/', include('api.urls', namespace='api')),
+    path('votes/', include('votes.urls', namespace='votes')),
     path('', include('questions.urls', namespace='questions')),
 ]
 

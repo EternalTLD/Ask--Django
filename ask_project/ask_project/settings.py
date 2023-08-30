@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'taggit',
     'django.contrib.postgres',
     'rest_framework',
-    'api'
+    'api',
+    'votes'
 ]
 
 MIDDLEWARE = [
