@@ -2,28 +2,18 @@ from django.db import models
 from django.db.models.query import QuerySet
 from django.urls import reverse
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.fields import GenericRelation
 
 from taggit.managers import TaggableManager
-from users.models import User
+from votes.models import Vote
 
+
+User = get_user_model()
     
 class PublishedManager(models.Manager):
     def get_queryset(self) -> QuerySet:
         return super().get_queryset().filter(draft=False)
-    
-class QuestionVote(models.Model):
-    LIKE = 1
-    DISLIKE = -1
-
-    VOTES = (
-        (LIKE, 'like'),
-        (DISLIKE, 'dislike')
-    )
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    obj = models.ForeignKey('Question', on_delete=models.CASCADE)
-    vote = models.SmallIntegerField(choices=VOTES, verbose_name='Голос')
-    voted_at = models.DateTimeField(auto_now_add=True)
 
 class Question(models.Model):
     """Questions"""
@@ -38,13 +28,7 @@ class Question(models.Model):
         related_name= 'questions', 
         verbose_name='Пользователь',
     )
-    votes = models.ManyToManyField(
-        User,
-        blank=True,
-        related_name='question_user',
-        through=QuestionVote,
-        verbose_name='Голос',
-    )
+    votes = GenericRelation(Vote, related_query_name='questions')
     date_published = models.DateTimeField(default=timezone.now, verbose_name='Дата публикации')
     date_created = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     date_updated = models.DateTimeField(auto_now=True, verbose_name='Дата изменения')
@@ -80,20 +64,6 @@ class QuestionImages(models.Model):
         verbose_name = 'Картинка к вопросу'
         verbose_name_plural = 'Картинки к вопросу'
     
-class AnswerVote(models.Model):
-    LIKE = 1
-    DISLIKE = -1
-
-    VOTES = (
-        (LIKE, 'like'),
-        (DISLIKE, 'dislike')
-    )
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    obj = models.ForeignKey('Answer', on_delete=models.CASCADE)
-    vote = models.SmallIntegerField(choices=VOTES, verbose_name='Голос')
-    voted_at = models.DateTimeField(auto_now_add=True)
-    
 class Answer(models.Model):
     """Answers"""
     question = models.ForeignKey(
@@ -108,13 +78,7 @@ class Answer(models.Model):
         related_name='answers',
         verbose_name='Пользователь',
     )
-    votes = models.ManyToManyField(
-        User,
-        blank=True,
-        related_name='answer_user',
-        through=AnswerVote,
-        verbose_name='Голос',
-    )
+    votes = GenericRelation(Vote, related_query_name='answers')
     content = models.TextField(verbose_name='Содержание')
     date_published = models.DateField(auto_now_add=True, verbose_name='Дата публикации')
     best_answer = models.BooleanField(default=False, verbose_name='Лучший ответ')
@@ -130,12 +94,3 @@ class Answer(models.Model):
 
     def __str__(self) -> str:
         return f'Ответ {self.author} на вопрос {self.question}'
-
-class AnswerImages(models.Model):
-    """Additional images"""
-    answer = models.ForeignKey(Answer, on_delete=models.CASCADE, verbose_name='Ответ')
-    image = models.ImageField(blank=True, null=True, upload_to='answers_images/%Y/%m/%d/', verbose_name='Картинка')
-
-    class Meta:
-        verbose_name = 'Картинка к ответу'
-        verbose_name_plural = 'Картинки к ответу'

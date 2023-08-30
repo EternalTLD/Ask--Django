@@ -1,6 +1,6 @@
 from typing import Any, Dict
 from django.db.models.query import QuerySet
-from django.db.models import Count
+from django.db.models import Count, F
 from django.utils.text import slugify
 from django.urls import reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
@@ -63,13 +63,18 @@ class QuestionDetailView(DetailView):
         context['form'] = AnswerForm()
         question = self.get_object()
         context['answers'] = question.answers.filter(active=True)
-
-        #similar questions by same tags
-        question_tags_ids = question.tags.values_list('id', flat=True)
-        similar_questions = Question.published.filter(tags__in=question_tags_ids).exclude(id=question.id)
-        similar_questions = similar_questions.annotate(same_tags=Count('tags')).order_by('-same_tags', '-date_published')[:4]
-        context['similar_questions'] = similar_questions
+        context['similar_questions'] = self.get_similar_questions(question)
         return context
+
+    def get_similar_questions(self, question, limit=4):
+        question_tags_ids = question.tags.values_list('id', flat=True)
+        similar_questions = Question.published.filter(
+            tags__in=question_tags_ids
+        ).exclude(id=question.id)
+        similar_questions = similar_questions.annotate(
+            same_tags=Count('tags')
+        ).order_by('-same_tags', '-date_published')[:limit]
+        return similar_questions
     
 class AnswerFormView(SingleObjectMixin, FormView):
     template_name = 'questions/question_detail.html'
@@ -86,9 +91,7 @@ class QuestionView(View):
     def get(self, request, *args, **kwargs):
         view = QuestionDetailView.as_view()
         question_id = self.kwargs.get('pk')
-        question = Question.objects.filter(pk=question_id)
-        views = question.values()[0]['views'] + 1
-        question.update(views=views)
+        Question.objects.filter(pk=question_id).update(views=F('views')+1)
         return view(request, *args, **kwargs)
     
     def post(self, request, *args, **kwargs):
@@ -140,61 +143,6 @@ class QuestionDeleteView(DeleteView):
     model = Question
     success_url = '/'
     context_object_name = 'question'
-    
-
-class VoteView(View):
-    model = None
-    vote_model = None
-    vote_type = None
-
-    def post(self, request, pk):
-        vote_target = self.model.objects.get(pk=pk)
-
-        try:
-            vote_object = self.vote_model.objects.get(user=request.user, vote_target=vote_target)
-            if vote_object.vote is not self.vote_type:
-                vote_object.vote = self.vote_type
-                vote_object.save(update_fields=['vote'])
-                self.send_vote_notification(vote_target)
-            else:
-                vote_object.delete()
-                self.delete_vote_notification(vote_target)
-        except ObjectDoesNotExist:
-            vote_target.votes.add(request.user, through_defaults={'vote': self.vote_type})
-            self.send_vote_notification(vote_target)
-
-        return HttpResponseRedirect(reverse('questions:home'))
-    
-    def send_vote_notification(self, vote_target):
-        Notification.objects.create(
-            from_user=self.request.user,
-            to_user=vote_target.author,
-            question=self.get_vote_target_question(vote_target),
-            type=self.get_notification_type(),
-        )
-
-    def delete_vote_notification(self, vote_target):
-        notification = get_object_or_404(
-            Notification,
-            from_user=self.request.user,
-            to_user=vote_target.author,
-            question=self.get_vote_target_question(vote_target),
-            type=self.get_notification_type(),
-        )
-        notification.delete()
-
-    def get_vote_target_question(self, vote_target):
-        if self.model is Question:
-            return vote_target
-        elif self.model is Answer:
-            return vote_target.question
-
-    def get_notification_type(self):
-        if self.vote_type == 1:
-            if self.model is Question:
-                return 'QL'
-            elif self.model is Answer:
-                return 'AL'
     
 def question_search_view(request):
     form = SearchForm()
