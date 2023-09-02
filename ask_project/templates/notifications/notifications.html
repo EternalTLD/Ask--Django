@@ -13,40 +13,66 @@
             <form action="{% url 'notifications:unread' %}">
                 <button type="submit" class="btn btn-primary" data-mdb-ripple-color="dark">Непрочитанные</button>
             </form>
-            <form action="{% url 'notifications:sent' %}">
-                <button type="submit" class="btn btn-primary" data-mdb-ripple-color="dark">Отправленные</button>
-            </form> 
             <form action="{% url 'notifications:mark_all_as_read' %}" method="post">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-primary" data-mdb-ripple-color="dark">Прочитать все</button>
             </form> 
         </div>
     </div>
-    {% for n in notifications %}
-    <div class="card text-dark bg-light mb-3 mt-3">
-        <div class="row g-0">
-            <div class="col-md-4">
-                <p class="card-text">{{ n.created_at }}</p>
-                <p class="card-text">{{ n.read_at }}</p>
-            </div>
-            <div class="col-md-8 d-flex flex-column">
-                <div class="p-3">
-                    <h5 class="card-title"><a href="{{ n.question.get_absolute_url }}" class="href">{{ n }}</a></h5>
+    <div id="notification-list">
+        {% for n in notifications %}
+        <div class="card text-dark bg-light mb-3 mt-3">
+            <div class="d-flex flex-row g-0">
+                <div class="d-flex flex-column">
+                    <div class="p-3">
+                        <h5 id="notification-message" class="card-title">{{ n.message }}</h5>
+                    </div>
+                    <div class="p-3 d-flex">
+                        <p class="card-text">{{ n.created_at }}</p>
+                    </div>
                 </div>
-                {% if not n.read_at %}
-                <div>
-                    <form action="{% url 'notifications:mark_as_read' n.pk %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-primary" data-mdb-ripple-color="dark">Прочитано</button>
-                    </form>
-                </div>
-                {% endif %}
             </div>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
 <div class="col-3">
     {% include 'layout/tags.html' %}          
 </div>
+
+<script>
+
+    const notificationSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/notifications/'
+        + '{{request.user.username}}'
+        + '/'
+    );
+
+    notificationSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log(data)
+        notificationList = document.getElementById('notification-list');
+        notificationList.insertAdjacentHTML(
+            'afterbegin',
+            '<div class="card text-dark bg-light mb-3 mt-3">' +
+                '<div class="d-flex flex-row g-0">' +
+                    '<div class="d-flex flex-column">' +
+                        '<div class="p-3">' +
+                            '<h5 id="notification-message" class="card-title">' + data['message'] + '</h5>' +
+                        '</div>' +
+                        '<div class="p-3 d-flex">' +
+                            '<p class="card-text">' + data['created_at'] + '</p>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>'
+        );
+    };
+
+    notificationSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+</script>
 {% endblock %}
