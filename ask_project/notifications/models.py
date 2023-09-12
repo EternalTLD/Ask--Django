@@ -1,46 +1,43 @@
 from django.db import models
-from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from asgiref.sync import async_to_sync
 
+from channels.layers import get_channel_layer
 
-User = get_user_model()
+from ask_project import settings
+
 
 class NotificationManager(models.query.QuerySet):
     
-    def recieved(self, to_user):
-        qs = self.filter(to_user=to_user)
+    def unread(self):
+        qs = self.filter(is_read=False)
         return qs
     
-    def sent(self, from_user):
-        qs = self.filter(from_user=from_user)
-        return qs
-    
-    def unread(self, to_user):
-        qs = self.filter(to_user=to_user, is_read=False)
-        return qs
-    
-    def mark_all_as_read(self, to_user):
-        qs = self.unread(to_user=to_user)
+    def mark_all_as_read(self):
+        qs = self.unread()
         qs.update(is_read=True)
         return qs
 
 class Notification(models.Model):
     from_user = models.ForeignKey(
-        User, 
+        settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE,
         related_name='sent_notifications', 
         verbose_name='Отправитель',
     )
     to_user = models.ForeignKey(
-        User, 
+        settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE,
         related_name='recieved_notifications', 
         verbose_name='Получатель'
     )
     created_at = models.DateTimeField(default=timezone.now, verbose_name='Отправлено')
     is_read = models.BooleanField(default=False, verbose_name='Прочитано')
+    sent = models.BooleanField(default=False, verbose_name='Отправлено')
     message = models.CharField(null=True, verbose_name='Сообщение')
 
     target_content_type = models.ForeignKey(
@@ -67,3 +64,19 @@ class Notification(models.Model):
         self.is_read = True
         self.save()
         return True
+
+@receiver(post_save, sender=Notification)
+def notification_handler(sender, instance, created, **kwargs):
+    """Handler to send notification"""
+    if created:
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'notification_{instance.to_user.username}',
+            {
+                'type': 'send_notification',
+                'notification': {
+                    'message': instance.message,
+                    'created_at': instance.created_at.strftime('%Y-%m-%d %H:%m')
+                }
+            }
+        )
