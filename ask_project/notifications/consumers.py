@@ -1,28 +1,68 @@
 import json
 
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import WebsocketConsumer
+from asgiref.sync import async_to_sync
 
 
-class NotificationConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        self.username = self.scope["url_route"]["kwargs"]["username"]
-        self.notification_group_name = f"notification_{self.username}"
+class NotificationConsumer(WebsocketConsumer):
 
-        await self.channel_layer.group_add(
+    def connect(self):
+        self.user = self.scope['user']
+        self.username = self.scope['url_route']['kwargs']['username']
+        self.notification_group_name = f'notification_{self.username}'
+
+        async_to_sync(self.channel_layer.group_add)(
             self.notification_group_name, 
             self.channel_name
         )
 
-        await self.accept()
+        self.accept()
 
-    async def disconnect(self, close_code):
+    def disconnect(self, close_code):
 
-        await self.channel_layer.group_discard(
+        async_to_sync(self.channel_layer.group_discard)(
             self.notification_group_name, 
             self.channel_name
         )
 
-    async def send_notification(self, event):
-        message = event["message"]
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        if text_data_json['type'] == 'show_unread_push_notifications':
+            notifications = self.get_unread_notifications()
+            notifications = [
+                {
+                    'message': notification.message,
+                    'url': notification.url,
+                    'created_at': notification.created_at.strftime('%d-%m-%Y %H:%M')
+                } for notification in notifications
+            ]
 
-        await self.send(text_data=json.dumps(message))
+            async_to_sync(self.channel_layer.group_send)(
+                self.notification_group_name,
+                {
+                    'type': 'show_unread_push_notifications',
+                    'notifications': notifications,
+                    'count_notifications': len(notifications)
+                }
+            )
+        elif text_data_json['type'] == 'read_all_notifications':
+            self.user.recieved_notifications.mark_all_as_read()
+            async_to_sync(self.channel_layer.group_send)(
+                self.notification_group_name,
+                {
+                    'type': 'read_all_notifications',
+                }
+            )
+
+    def get_unread_notifications(self):
+        notifications = self.user.recieved_notifications.unread()
+        return notifications
+
+    def send_notification(self, event):
+        self.send(text_data=json.dumps(event))
+
+    def show_unread_push_notifications(self, event):
+        self.send(text_data=json.dumps(event))
+
+    def read_all_notifications(self, event):
+        self.send(text_data=json.dumps(event))
