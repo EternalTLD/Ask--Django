@@ -2,7 +2,7 @@ from django.urls import path
 
 from .views import (AllNotificationsListView, UnreadNotificationsListView,
                     mark_as_read_view, 
-                    mark_all_as_read_view)
+                    mark_all_as_read_view,)
 
 app_name = 'notifications'
 
