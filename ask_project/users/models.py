@@ -1,7 +1,5 @@
 from django.db import models
-from django.urls import reverse
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.validators import UnicodeUsernameValidator
 
 
 class User(AbstractUser):
@@ -22,7 +20,6 @@ class User(AbstractUser):
         },
         verbose_name='Email',
     )
-    is_activated = models.BooleanField(default=False, verbose_name="Пользователь прошел активацию?")
     send_messages = models.BooleanField(default=False, verbose_name='Отправлять уведомления на почту?')
     
     REQUIRED_FIELDS = ['email']
