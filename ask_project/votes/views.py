@@ -1,5 +1,5 @@
-from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.views import View
 from django.core.exceptions import ObjectDoesNotExist
@@ -26,43 +26,41 @@ class VoteView(View):
             if vote_object.vote is not self.vote_type:
                 vote_object.vote = self.vote_type
                 vote_object.save(update_fields=['vote'])
-                self.delete_vote_notification(obj)
-                self.send_vote_notification(obj)
+                self.create_vote_notifiction(obj)
             else:
                 vote_object.delete()
-                self.delete_vote_notification(obj)
         except ObjectDoesNotExist:
             obj.votes.create(user=request.user, vote=self.vote_type)
-            self.send_vote_notification(obj)
+            self.create_vote_notifiction(obj)
 
-        return HttpResponseRedirect(reverse('questions:home'))
-    
-    def send_vote_notification(self, obj):
-        Notification.objects.create(
+        data = {
+            'vote_type': self.vote_type,
+            'total_likes': obj.votes.count_likes(),
+            'total_dislikes': obj.votes.count_dislikes(),
+        }
+
+        return JsonResponse(data)
+
+    def create_vote_notifiction(self, obj):
+        notification = Notification.objects.create(
             from_user=self.request.user,
             to_user=obj.author,
             target_content_type=ContentType.objects.get_for_model(obj),
             target_object_id=obj.id,
-            message=self.get_notification_message()
+            message=self.get_vote_notification_message(obj),
+            url=obj.get_absolute_url()
         )
+        return notification
 
-    def get_notification_message(self):
+    def get_vote_notification_message(self, obj):
         if self.model is Question:
-            obj = 'вопрос'
+            target = 'вопрос ' + obj.title
         elif self.model is Answer:
-            obj = 'ответ'
+            target = 'ответ на вопрос ' + obj.question.title
+
         if self.vote_type == 1:
             action = 'понравился'
         else:
             action = 'не понравился'
-        return f'Пользователю {self.request.user.username} {action} ваш {obj}.'
-
-    def delete_vote_notification(self, obj):
-        notification = get_object_or_404(
-            Notification,
-            from_user=self.request.user,
-            to_user=obj.author,
-            target_content_type=ContentType.objects.get_for_model(obj),
-            target_object_id=obj.id,
-        )
-        notification.delete()
+            
+        return f'Пользователю {self.request.user.username} {action} ваш {target}.'
