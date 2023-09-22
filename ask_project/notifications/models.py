@@ -39,6 +39,7 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False, verbose_name='Прочитано')
     sent = models.BooleanField(default=False, verbose_name='Отправлено')
     message = models.CharField(null=True, verbose_name='Сообщение')
+    url = models.URLField(null=True, verbose_name='URL')
 
     target_content_type = models.ForeignKey(
         ContentType, 
@@ -76,7 +77,8 @@ def notification_handler(sender, instance, created, **kwargs):
                 'type': 'send_notification',
                 'notification': {
                     'message': instance.message,
-                    'created_at': instance.created_at.strftime('%Y-%m-%d %H:%m')
+                    'created_at': instance.created_at.strftime('%Y-%m-%d %H:%m'),
+                    'url': instance.url
                 }
             }
         )
