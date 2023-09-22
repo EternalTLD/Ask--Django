@@ -2,14 +2,12 @@ from django.db import models
 from django.db.models.query import QuerySet
 from django.urls import reverse
 from django.utils import timezone
-from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericRelation
 
 from taggit.managers import TaggableManager
 from votes.models import Vote
+from ask_project import settings
 
-
-User = get_user_model()
     
 class PublishedManager(models.Manager):
     def get_queryset(self) -> QuerySet:
@@ -23,7 +21,7 @@ class Question(models.Model):
         verbose_name='Заголовок'
     )
     author = models.ForeignKey(
-        User, 
+        settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE,
         related_name= 'questions', 
         verbose_name='Пользователь',
@@ -73,7 +71,7 @@ class Answer(models.Model):
         verbose_name='Вопрос',
     )
     author = models.ForeignKey(
-        User, 
+        settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE, 
         related_name='answers',
         verbose_name='Пользователь',
@@ -94,3 +92,6 @@ class Answer(models.Model):
 
     def __str__(self) -> str:
         return f'Ответ {self.author} на вопрос {self.question}'
+    
+    def get_absolute_url(self):
+        return reverse('questions:question_detail', kwargs={'pk': self.question.pk, 'slug': self.question.slug})
