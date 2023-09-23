@@ -24,11 +24,13 @@
         <div class="card text-dark bg-light mb-3 mt-3">
             <div class="d-flex flex-row g-0">
                 <div class="d-flex flex-column">
-                    <div class="p-3">
-                        <h5 id="notification-message" class="card-title">{{ n.message }}</h5>
-                    </div>
+                    <a href="{{n.url}}">
+                        <div class="p-3">
+                            <h5 id="notification-message" class="card-title">{{ n.message }}</h5>
+                        </div>
+                    </a>
                     <div class="p-3 d-flex">
-                        <p class="card-text">{{ n.created_at }}</p>
+                        <p class="card-text">{{ n.created_at|date:"d-m-Y H:i" }}</p>
                     </div>
                 </div>
             </div>
@@ -41,7 +43,7 @@
 </div>
 
 <script>
-
+    const notificationList = document.getElementById('notification-list');
     const notificationSocket = new WebSocket(
         'ws://'
         + window.location.host
@@ -52,16 +54,16 @@
 
     notificationSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
-        console.log(data)
-        notificationList = document.getElementById('notification-list');
         notificationList.insertAdjacentHTML(
             'afterbegin',
             '<div class="card text-dark bg-light mb-3 mt-3">' +
                 '<div class="d-flex flex-row g-0">' +
                     '<div class="d-flex flex-column">' +
-                        '<div class="p-3">' +
-                            '<h5 id="notification-message" class="card-title">' + data['message'] + '</h5>' +
-                        '</div>' +
+                        '<a href=' + data['url'] + '>' +
+                            '<div class="p-3">' +
+                                '<h5 id="notification-message" class="card-title">' + data['message'] + '</h5>' +
+                            '</div>' +
+                        '</a>' +
                         '<div class="p-3 d-flex">' +
                             '<p class="card-text">' + data['created_at'] + '</p>' +
                         '</div>' +

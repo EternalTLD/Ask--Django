@@ -13,7 +13,9 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link d-flex flex-column text-center" aria-current="page" href="{% url 'questions:popular_questions' %}"><span class="small">Популярные вопросы</span></a>
+          <a class="nav-link" aria-current="page" href="{% url 'questions:popular_questions' %}">
+            Популярные вопросы
+          </a>
         </li>
         {% if request.user.is_authenticated %}
           <a
@@ -25,23 +27,38 @@
             aria-expanded="false"
           >
             <img
-              src="https://mdbootstrap.com/img/Photos/Avatars/img%20(9).jpg"
+              src="{{request.user.profile.get_profile_image}}"
               class="rounded-circle"
               height="30"
+              width="30"
               alt=""
               loading="lazy"
             />
           </a>
-            
-          <li class="nav-item">
-            <a class="nav-link d-flex flex-column text-center" aria-current="page" href="{% url 'profiles:profile_detail' request.user.username %}"><span class="small">Профиль</span></a>
+          
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+              Уведомления (<small id="notification-counter"></small>)
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+              <li><a class="dropdown-item" href="{% url 'notifications:all' %}">Все уведомления</a></li>
+              <li><a id="read-all" class="dropdown-item" href="">Прочитать все</a></li>
+              <li id="push-notifications" class="overflow-scroll" style="max-height: 300px;"></li>
+            </ul>
           </li>
-          <li class="nav-item">
-            <a class="nav-link d-flex flex-column text-center" aria-current="page" href="{% url 'notifications:unread' %}"><span class="small">Уведомления</span></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link d-flex flex-column text-center" aria-current="page" href="{% url 'users:logout' %}"><span class="small">Выйти</span></a>
-          </li>
+
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+              {{request.user.username}}
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+              <li><a class="dropdown-item" href="{{ request.user.profile.get_absolute_url }}">Профиль</a></li>
+              <li><a class="dropdown-item" href="{% url 'profiles:profile_edit' %}">Редактировать</a></li>
+              <li><a class="dropdown-item" href="{% url 'users:password_change' %}">Сменить пароль</a></li>
+              <div class="dropdown-divider"></div>
+              <li><a class="dropdown-item" href="{% url 'users:logout' %}">Выйти</a></li>
+            </ul>
+          </li>>
         {% else %}
           <li class="nav-item">
             <a class="nav-link d-flex flex-column text-center" aria-current="page" href="{% url 'users:registration' %}"><span class="small">Зарегистрироваться</span></a>

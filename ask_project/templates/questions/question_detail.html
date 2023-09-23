@@ -14,10 +14,10 @@
           <p>Просмотров - {{ question.views }}</p>
         </div>
         <div class="d-flex mx-2">
-          <p>Опубликовано - {{ question.date_published }}</p>
+          <p>Опубликовано - {{ question.date_published|date:"d-m-Y H:i" }}</p>
         </div>
         <div class="d-flex mx-2">
-          <p>Изменено - {{ question.date_updated }}</p>
+          <p>Изменено - {{ question.date_updated|date:"d-m-Y H:i" }}</p>
         </div>
       </div>
       <hr style="margin-top: 0.1em; margin-bottom: 0.1em;">
@@ -25,7 +25,7 @@
       <div class="p-3 d-flex justify-content-left">
         <h6>{{ question.content }}</h6>
       </div>
-
+      {% if request.user == question.author %}
       <div class="d-flex flex-row justify-content-end">
         <div class="d-flex align-items-start" style="padding: .8rem .2rem .0rem .6rem;">
           <form action="{% url 'questions:question_update' question.pk %}">
@@ -44,6 +44,7 @@
           </form>
         </div>
       </div>
+      {% endif %}
 
       <div class="d-flex flex-row justify-content-left">
         {% for tag in question.tags.all %}
@@ -58,13 +59,16 @@
       </div>
     </div>
   </div>
-  {% include 'layout/slider.html' %}
   {% include 'layout/answers.html' with answers=answers question=question %}
 
 </div>
 
 <div class="col-3">
-  {% include 'layout/questions_side_menu.html' with questions=similar_questions %}
+  {% if similar_questions%}
+    {% include 'layout/questions_side_menu.html' with questions=similar_questions %}
+  {% else %}
+    {% include 'layout/popular_tags.html' %}
+  {% endif %}
 </div>
 
 {% endblock %}

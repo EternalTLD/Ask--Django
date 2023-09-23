@@ -11,7 +11,7 @@
         <div class="col-4 bg-light">
             <div class="p-3 px-3 d-flex flex-column justify-content-center">
                 <div class="p-2 d-flex justify-content-center">
-                    <img class="rounded-circle" src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(19).webp" alt="avatar" width="210" height="210" />
+                    <img class="rounded-circle" src="{{user.profile.get_profile_image}}" alt="avatar" width="210" height="210" />
                 </div>
                 <div class="p-2 d-flex justify-content-center rounded">
                     <form action="{% url 'profiles:profile_edit' %}">
@@ -39,7 +39,7 @@
     <h2 class="mt-3 p-3 border bg-light rounded">
         Список вопросов
     </h2>
-    {% include 'layout/questions.html' with questions=user_questions %}
+    {% include 'layout/questions.html' with questions=user.questions.all %}
 </div>
 <div class="col-3">
     <div class="position-fixed">
@@ -48,11 +48,11 @@
         </h2>
         <div class="p-3 border text-light bg-light rounded" style="width: 20rem;">
             <ul class="list-group">
-                <li class="list-group-item list-group-item-primary">На сайте с {{ user.date_joined }}</li>
+                <li class="list-group-item list-group-item-primary">На сайте с {{ user.date_joined|date:"d-m-Y" }}</li>
                 <li class="list-group-item list-group-item-primary">Задано вопросов - {{ user.pk|count_user_questions }}</li>
                 <li class="list-group-item list-group-item-primary">Отправлено ответов - {{ user.pk|count_user_answers }}</li>
-                <li class="list-group-item list-group-item-success">Получено лайков - {{ user.pk|count_user_recieved_likes }}</li>
-                <li class="list-group-item list-group-item-danger">Получено дизлайков - {{ user.pk|count_user_recieved_dislikes }}</li>
+                <li class="list-group-item list-group-item-success">Получено лайков - </li>
+                <li class="list-group-item list-group-item-danger">Получено дизлайков - </li>
             </ul>
         </div>
     </div>

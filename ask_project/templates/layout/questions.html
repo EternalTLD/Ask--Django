@@ -7,28 +7,18 @@
         <div class="mb-auto d-flex flex-column bd-highlight" style="padding: .0rem .0rem .0rem 0.6rem ;">
             <h3 class="mb-1"><a href="{{ question.get_absolute_url }}" class="href">{{ question.title }}</a></h3>
             <div class="mb-1 text-muted">
-                <div>Опубликовано - {{ question.date_published }}</div>
+                <div>Опубликовано - {{ question.date_published|date:"d-m-Y" }}</div>
             </div>
-            <div class="d-flex flex-column">
-                {{ question.content }}
+            <div class="d-flex flex-row">
+                <p>
+                    {{ question.content|shortify_question_content }}
+                </p>
             </div>
         </div>
 
         <div class="bd-highlight">
-            <div class="d-flex flex-row justify-content-left">
-                <div class="d-flex align-items-start" style="padding: .9rem 0rem .0rem .0rem;">
-                    <form method="post" action="{% url 'questions:question_like' question.pk %}">
-                        {% csrf_token %}
-                        <button class="btn" id="green"><i class="fa fa-thumbs-up fa-lg" aria-hidden="true"> {{ question.pk|count_question_likes }}</i></button>
-                    </form>
-                </div>
-                <div class="d-flex align-items-start" style="padding: .9rem 0rem .0rem .0rem;">
-                    <form method="post" action="{% url 'questions:question_dislike' question.pk %}">
-                        {% csrf_token %}
-                        <button class="btn" id="red"><i class="fa fa-thumbs-down fa-lg" aria-hidden="true"> {{ question.pk|count_question_dislikes }}</i></button>
-                    </form>
-                </div>
-            </div>
+
+            {% include 'layout/votes.html' with obj=question type='question' %}
 
             <div class="d-flex flex-row justify-content-left">
                 {% for tag in question.tags.all %}
@@ -45,39 +35,16 @@
 
     </div>
 
-    <div class="col-4">
-        <div class="p-3 d-flex flex-column justify-content-center border bg-light">
+    <div class="col-4 border bg-light">
+        <div class="p-3 d-flex flex-column justify-content-center">
             <div class="p-2 d-flex justify-content-center">
-                <img class="rounded-circle" src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(19).webp" alt="avatar" width="200" height="200">
+                <img class="rounded-circle" src="{{question.author.profile.get_profile_image}}" alt="profile_image" width="200" height="200">
             </div>
             <a class="list-group-item list-group-item-action text-center rounded" href="{% url 'profiles:profile_detail' question.author.username %}">{{ question.author.username }}</a>
         </div>
     </div>
 
 </div>
-<script src="https://use.fontawesome.com/fe459689b4.js"></script>
-<script>
-    var btn1 = document.querySelector('#green');
-var btn2 = document.querySelector('#red');
-
-btn1.addEventListener('click', function() {
-  
-    if (btn2.classList.contains('red')) {
-      btn2.classList.remove('red');
-    } 
-  this.classList.toggle('green');
-  
-});
-
-btn2.addEventListener('click', function() {
-  
-    if (btn1.classList.contains('green')) {
-      btn1.classList.remove('green');
-    } 
-  this.classList.toggle('red');
-  
-});
-</script>
 
 {% empty %}
 Вопросов не найдено
