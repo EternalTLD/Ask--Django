@@ -1,8 +1,8 @@
 from django.db import models
-from django.db.models.query import QuerySet
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.contenttypes.fields import GenericRelation
+from django.db.models import Count
 
 from taggit.managers import TaggableManager
 from votes.models import Vote
@@ -10,8 +10,20 @@ from ask_project import settings
 
     
 class PublishedManager(models.Manager):
-    def get_queryset(self) -> QuerySet:
+    """Published questions manager"""
+
+    def get_queryset(self):
+        """Returns query set of published questions"""
         return super().get_queryset().filter(draft=False)
+    
+    def get_similar_questions(self, question, limit=4):
+        """Returns query set of published questions similar to a specific question"""
+        question_tags_ids = question.tags.values_list('id', flat=True)
+        similar_questions = self.get_queryset().filter(tags__in=question_tags_ids) \
+                                               .exclude(id=question.id) \
+                                               .annotate(same_tags=Count('tags')) \
+                                               .order_by('-same_tags', '-date_published')[:limit]
+        return similar_questions
 
 class Question(models.Model):
     """Questions"""
