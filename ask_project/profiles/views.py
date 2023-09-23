@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from django.core.paginator import Paginator
 from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
 
 from .forms import UserEditForm, ProfileEditForm
 from users.models import User
@@ -13,20 +13,18 @@ class ProfileDetailView(DetailView):
     slug_url_kwarg = 'username'
     context_object_name = 'user'
 
-    def get_context_data(self, **kwargs):
-        context = super(DetailView, self).get_context_data(**kwargs)
-        user_questions = self.get_user_questions()
-        context['user_questions'] = user_questions
-        context['page_obj'] = user_questions
-        return context
-    
-    def get_user_questions(self):
-        user = self.get_object()
-        user_questions = Question.objects.filter(author=user)
-        paginator = Paginator(user_questions, 3)
-        page = self.request.GET.get('page')
-        page_obj = paginator.get_page(page)
-        return page_obj
+    def get_object(self, queryset=None):
+        return self.model.objects.select_related('profile').prefetch_related('questions').get(username=self.request.user)
+
+class UserFavoriteQuestionList(ListView):
+    template_name = 'profiles/favorite_questions.html'
+    model = Question
+    context_object_name = 'question_list'
+    paginate_by = 10
+
+    def get_queryset(self):
+        questions = Question.published.filter(votes__vote=1, votes__user=self.request.user)
+        return questions
 
 def profile_edit_view(request):
 
