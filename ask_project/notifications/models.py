@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -12,12 +13,15 @@ from ask_project import settings
 
 
 class NotificationManager(models.query.QuerySet):
-    
+    """Notification manager"""
+
     def unread(self):
+        """Returns query set of unread notifications"""
         qs = self.filter(is_read=False)
         return qs
     
     def mark_all_as_read(self):
+        """Marks unread notifications as read and returns them"""
         qs = self.unread()
         qs.update(is_read=True)
         return qs
@@ -56,20 +60,22 @@ class Notification(models.Model):
     class Meta:
         verbose_name = 'Уведомление'
         verbose_name_plural = 'Уведомления'
-        ordering = ['-created_at']
+        ordering = ['created_at']
 
     def __str__(self) -> str:
         return self.message
 
-    def mark_as_read(self):
+    def mark_as_read(self) -> bool:
         self.is_read = True
         self.save()
         return True
 
 @receiver(post_save, sender=Notification)
-def notification_handler(sender, instance, created, **kwargs):
+def notification_handler(**kwargs) -> None:
     """Handler to send notification"""
-    if created:
+
+    instance = kwargs.pop('instance')
+    if kwargs.pop('created'):
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             f'notification_{instance.to_user.username}',
