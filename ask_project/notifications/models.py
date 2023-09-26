@@ -1,12 +1,10 @@
 from django.db import models
-from django.db.models.query import QuerySet
 from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from asgiref.sync import async_to_sync
-
 from channels.layers import get_channel_layer
 
 from ask_project import settings
@@ -27,6 +25,7 @@ class NotificationManager(models.query.QuerySet):
         return qs
 
 class Notification(models.Model):
+    """Notification model"""
     from_user = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE,
@@ -73,7 +72,6 @@ class Notification(models.Model):
 @receiver(post_save, sender=Notification)
 def notification_handler(**kwargs) -> None:
     """Handler to send notification"""
-
     instance = kwargs.pop('instance')
     if kwargs.pop('created'):
         channel_layer = get_channel_layer()
