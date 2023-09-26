@@ -1,12 +1,15 @@
 import json
 
+from django.db.models.query import QuerySet
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
+
+from notifications.models import Notification
 
 
 class NotificationConsumer(WebsocketConsumer):
 
-    def connect(self):
+    def connect(self) -> None:
         self.user = self.scope['user']
         self.username = self.scope['url_route']['kwargs']['username']
         self.notification_group_name = f'notification_{self.username}'
@@ -18,14 +21,14 @@ class NotificationConsumer(WebsocketConsumer):
 
         self.accept()
 
-    def disconnect(self, close_code):
-
+    def disconnect(self, close_code) -> None:
+        
         async_to_sync(self.channel_layer.group_discard)(
             self.notification_group_name, 
             self.channel_name
         )
 
-    def receive(self, text_data):
+    def receive(self, text_data) -> None:
         text_data_json = json.loads(text_data)
         if text_data_json['type'] == 'show_unread_push_notifications':
             notifications = self.get_unread_notifications()
@@ -54,15 +57,15 @@ class NotificationConsumer(WebsocketConsumer):
                 }
             )
 
-    def get_unread_notifications(self):
+    def get_unread_notifications(self) -> QuerySet[Notification]:
         notifications = self.user.recieved_notifications.unread()
         return notifications
 
-    def send_notification(self, event):
+    def send_notification(self, event) -> None:
         self.send(text_data=json.dumps(event))
 
-    def show_unread_push_notifications(self, event):
+    def show_unread_push_notifications(self, event) -> None:
         self.send(text_data=json.dumps(event))
 
-    def read_all_notifications(self, event):
+    def read_all_notifications(self, event) -> None:
         self.send(text_data=json.dumps(event))

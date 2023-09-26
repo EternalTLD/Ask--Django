@@ -1,9 +1,9 @@
 from typing import Any
-from django import http
 from django.db.models import F
+from django.db.models.query import QuerySet
 from django.utils.text import slugify
 from django.urls import reverse
-from django.http import HttpRequest, HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.search import TrigramSimilarity
@@ -27,20 +27,20 @@ class QuestionsListView(ListView):
     context_object_name = 'questions_list'
     paginate_by = 10
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['page_title'] = 'Последние вопросы'
         return context
 
 class QuestionsByTagListView(QuestionsListView):
      
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Question]:
         tag_slug = self.kwargs.get('tag_slug')
         tag = get_object_or_404(Tag, slug=tag_slug)
         questions_list = get_list_or_404(Question.published.filter(tags__in=[tag]))
         return questions_list
     
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['page_title'] = f"Вопросы с тегом {self.kwargs.get('tag_slug')}"
         return context
@@ -48,7 +48,7 @@ class QuestionsByTagListView(QuestionsListView):
 class PopularQuestionsListView(QuestionsListView):
     queryset = Question.published.order_by('-views', '-votes')
     
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['page_title'] = 'Популярные вопросы'
         return context
@@ -58,7 +58,7 @@ class QuestionDetailView(DetailView):
     model = Question
     context_object_name = 'question'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
         context['form'] = AnswerForm()
         question = self.get_object()
@@ -71,20 +71,20 @@ class AnswerFormView(SingleObjectMixin, FormView):
     form_class = AnswerForm
     model = Answer
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         self.object = self.get_queryset()
         return super().post(request, *args, **kwargs)
     
 class QuestionView(View):
     
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         view = QuestionDetailView.as_view()
         question_id = self.kwargs.get('pk')
         Question.objects.filter(pk=question_id).update(views=F('views')+1)
         return view(request, *args, **kwargs)
     
     @method_decorator(login_required)
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         view = AnswerFormView.as_view()   
         form = AnswerForm(request.POST)
         if form.is_valid():
@@ -100,10 +100,10 @@ class QuestionCreateView(CreateView):
     form_class = QuestionForm
 
     @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         return super().dispatch(request, *args, **kwargs)
 
-    def post(self, request: HttpRequest, *args, **kwargs):
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         form = QuestionForm(request.POST)
         if form.is_valid():
             title = form.cleaned_data.get('title')
@@ -124,7 +124,7 @@ class QuestionUpdateView(UpdateView):
     template_name = 'questions/question_update_form.html'
     context_object_name = 'question'
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         question = self.get_object()
         if request.user != question.author:
             return HttpResponseForbidden()
@@ -138,13 +138,13 @@ class QuestionDeleteView(DeleteView):
     success_url = '/'
     context_object_name = 'question'
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         question = self.get_object()
         if request.user != question.author:
             return HttpResponseForbidden()
         return super().post(request, *args, **kwargs)
     
-def question_search_view(request):
+def question_search_view(request: HttpRequest) -> HttpResponse:
     form = SearchForm()
     query = None
     results = []

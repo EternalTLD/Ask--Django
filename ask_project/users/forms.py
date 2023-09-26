@@ -1,7 +1,8 @@
-from typing import Any, Mapping, Optional, Type, Union
+from typing import Any
+
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from django.forms.utils import ErrorList
+
 from .models import User
 
 
@@ -18,13 +19,13 @@ class UserRegistrationForm(UserCreationForm):
             'password2',
         )
 
-    def clean_username(self):
+    def clean_username(self) -> str:
         username = self.cleaned_data['username']
         if ' ' in username:
             raise forms.ValidationError('Имя пользователя не должно содержать пробелы.')
         return username
     
-    def clean_email(self):
+    def clean_email(self) -> str:
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email):
             raise forms.ValidationError('Пользователь с таким email-адресом уже зарегистрирован.')
@@ -37,7 +38,7 @@ class UserRegistrationForm(UserCreationForm):
             raise forms.ValidationError('Пароли не совпадают!')
         return password2
     
-    def save(self, commit=True):
+    def save(self, commit: bool = True) -> Any:
         user = super(UserCreationForm, self).save(commit=False)
         user.first_name = self.cleaned_data.get('first_name').capitalize()
         user.last_name = self.cleaned_data.get('last_name').capitalize()

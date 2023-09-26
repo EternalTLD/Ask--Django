@@ -1,3 +1,5 @@
+from typing import Any
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.db.models.query import QuerySet
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic.list import ListView
@@ -13,22 +15,22 @@ class NotificationsListView(ListView):
     paginate_by = 20
 
     @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         return super(NotificationsListView, self).dispatch(request, *args, **kwargs)
 
 class AllNotificationsListView(NotificationsListView):
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Notification]:
         notifications = self.request.user.recieved_notifications.all()
         return notifications
     
 class UnreadNotificationsListView(NotificationsListView):
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Notification]:
         notifications = self.request.user.recieved_notifications.unread()
         return notifications
 
-def mark_as_read_view(request, id):
+def mark_as_read_view(request, id: int) -> HttpResponseRedirect:
     if request.method == 'POST':
         notification = get_object_or_404(
             Notification, 
@@ -39,7 +41,7 @@ def mark_as_read_view(request, id):
     
     return redirect('notifications:unread')
 
-def mark_all_as_read_view(request):
+def mark_all_as_read_view(request) -> HttpResponseRedirect:
     if request.method == 'POST':
         request.user.recieved_notifications.mark_all_as_read()
 

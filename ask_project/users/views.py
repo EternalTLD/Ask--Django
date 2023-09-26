@@ -1,5 +1,8 @@
+from typing import Any
+
 from django.shortcuts import render
 from django.views.generic.edit import CreateView
+from django.http import HttpResponse, HttpRequest
 
 from .models import User
 from .forms import UserRegistrationForm
@@ -10,7 +13,7 @@ class UserRegistrationView(CreateView):
     model = User
     form_class = UserRegistrationForm
     
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         user_form = UserRegistrationForm(request.POST)
 
         if user_form.is_valid():

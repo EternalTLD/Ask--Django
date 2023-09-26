@@ -1,9 +1,8 @@
-from django.http import JsonResponse
-from django.shortcuts import redirect
-from django.urls import reverse
+from django.http import JsonResponse, HttpRequest
 from django.views import View
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Model
 
 from notifications.models import Notification
 from questions.models import Answer, Question
@@ -14,7 +13,7 @@ class VoteView(View):
     model = None
     vote_type = None
 
-    def post(self, request, pk):
+    def post(self, request: HttpRequest, pk: int) -> JsonResponse:
         obj = self.model.objects.get(pk=pk)
 
         try:
@@ -41,7 +40,7 @@ class VoteView(View):
 
         return JsonResponse(data)
 
-    def create_vote_notifiction(self, obj):
+    def create_vote_notifiction(self, obj: Model) -> Notification:
         notification = Notification.objects.create(
             from_user=self.request.user,
             to_user=obj.author,
@@ -52,7 +51,7 @@ class VoteView(View):
         )
         return notification
 
-    def get_vote_notification_message(self, obj):
+    def get_vote_notification_message(self, obj: Model) -> str:
         if self.model is Question:
             target = 'вопрос ' + obj.title
         elif self.model is Answer:

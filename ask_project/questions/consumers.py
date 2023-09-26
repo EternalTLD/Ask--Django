@@ -10,7 +10,7 @@ from .models import Question, Answer
 
 class AnswersConsumer(WebsocketConsumer):
 
-    def connect(self):
+    def connect(self) -> None:
         self.question_id = self.scope['url_route']['kwargs']['question_id']
         self.question_group_name = f'question_{self.question_id}'
 
@@ -21,13 +21,13 @@ class AnswersConsumer(WebsocketConsumer):
         
         self.accept()
 
-    def disconnect(self, code):
+    def disconnect(self, code) -> None:
         async_to_sync(self.channel_layer.group_discard)(
             self.question_group_name,
             self.channel_name
         )
 
-    def receive(self, text_data):
+    def receive(self, text_data) -> None:
         text_data_json = json.loads(text_data)
         answer = text_data_json['text']
 
@@ -49,7 +49,7 @@ class AnswersConsumer(WebsocketConsumer):
             }
         )
 
-    def new_answer(self, event):
+    def new_answer(self, event) -> None:
         message = event['message']
         self.send(text_data=json.dumps(
             {
@@ -57,22 +57,19 @@ class AnswersConsumer(WebsocketConsumer):
             }
         ))
 
-    def create_new_answer(self, text):
+    def create_new_answer(self, text: str) -> Answer:
         question = Question.objects.get(id=int(self.question_id))
         new_answer = Answer.objects.create(
             question=question,
             author=self.scope['user'],
             content=text
         )
-
-        # Send notification to question author
         Notification.objects.create(
-                from_user=new_answer.author, 
-                to_user=question.author,
-                target_content_type=ContentType.objects.get_for_model(question),
-                target_object_id=question.id,
-                message=f'Пользователь {new_answer.author} ответил на вопрос {question}',
-                url=question.get_absolute_url()
-            )
-        
+            from_user=new_answer.author, 
+            to_user=question.author,
+            target_content_type=ContentType.objects.get_for_model(question),
+            target_object_id=question.id,
+            message=f'Пользователь {new_answer.author} ответил на вопрос {question}',
+            url=question.get_absolute_url()
+        )
         return new_answer
