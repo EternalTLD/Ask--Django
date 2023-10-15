@@ -1,0 +1,43 @@
+services:
+  web-app:
+    build:
+      context: .
+    container_name: "ask_web"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ask_project:/ask_project
+    environment:
+      - DB_HOST=database
+      - DB_NAME=dbname
+      - DB_USER=dbuser
+      - DB_PASS=pass
+    command: > 
+      sh -c "python manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - database
+      - redis
+
+  database:
+    image: postgres:15.4-alpine3.18
+    container_name: "ask_database"
+    environment:
+      - POSTGRES_DB=dbname
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=pass
+
+  redis:
+    image: redis:7.2.1-alpine
+    container_name: "ask_redis"
+    ports:
+      - "6379:6379"
+
+  django_asgi:
+    container_name: django_asgi
+    build: .
+    # command: python manage.py runserver 0.0.0.0:8000
+    command: daphne -b 0.0.0.0 -p 8000 ask_project.asgi:application
+    volumes:
+      - ./ask_project:/ask_project
+    links:
+      - redis
