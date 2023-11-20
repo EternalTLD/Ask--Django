@@ -7,40 +7,80 @@ import django.utils.timezone
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('notifications', '0004_alter_notification_unique_together_and_more'),
+        ("notifications", "0004_alter_notification_unique_together_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='notification',
-            name='read_at',
+            model_name="notification",
+            name="read_at",
         ),
         migrations.AddField(
-            model_name='notification',
-            name='is_read',
-            field=models.BooleanField(default=False, verbose_name='Прочитано'),
+            model_name="notification",
+            name="is_read",
+            field=models.BooleanField(default=False, verbose_name="Прочитано"),
         ),
         migrations.AlterField(
-            model_name='notification',
-            name='type',
-            field=models.CharField(choices=[('QL', 'Question like'), ('QD', 'Question dislike'), ('AL', 'Answer like'), ('AD', 'Answer dislike'), ('AQ', 'Answer to question')], max_length=2),
+            model_name="notification",
+            name="type",
+            field=models.CharField(
+                choices=[
+                    ("QL", "Question like"),
+                    ("QD", "Question dislike"),
+                    ("AL", "Answer like"),
+                    ("AD", "Answer dislike"),
+                    ("AQ", "Answer to question"),
+                ],
+                max_length=2,
+            ),
         ),
         migrations.CreateModel(
-            name='AlertNotification',
+            name="AlertNotification",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(default=django.utils.timezone.now, verbose_name='Отправлено')),
-                ('is_read', models.BooleanField(default=False, verbose_name='Прочитано')),
-                ('message', models.TextField(verbose_name='Сообщение')),
-                ('from_user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sent_alerts', to=settings.AUTH_USER_MODEL, verbose_name='Отправитель')),
-                ('to_user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='recieved_alerts', to=settings.AUTH_USER_MODEL, verbose_name='Получатель')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now, verbose_name="Отправлено"
+                    ),
+                ),
+                (
+                    "is_read",
+                    models.BooleanField(default=False, verbose_name="Прочитано"),
+                ),
+                ("message", models.TextField(verbose_name="Сообщение")),
+                (
+                    "from_user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="sent_alerts",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="Отправитель",
+                    ),
+                ),
+                (
+                    "to_user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="recieved_alerts",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="Получатель",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Оповещение',
-                'verbose_name_plural': 'Оповещения',
+                "verbose_name": "Оповещение",
+                "verbose_name_plural": "Оповещения",
             },
         ),
     ]

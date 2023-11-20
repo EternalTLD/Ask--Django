@@ -4,20 +4,19 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('questions', '0006_alter_answerimages_image_alter_questionimages_image'),
+        ("questions", "0006_alter_answerimages_image_alter_questionimages_image"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='answervote',
-            old_name='obj',
-            new_name='vote_target',
+            model_name="answervote",
+            old_name="obj",
+            new_name="vote_target",
         ),
         migrations.RenameField(
-            model_name='questionvote',
-            old_name='obj',
-            new_name='vote_target',
+            model_name="questionvote",
+            old_name="obj",
+            new_name="vote_target",
         ),
     ]

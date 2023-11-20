@@ -20,46 +20,46 @@ class VoteView(View):
             vote_object = Vote.objects.get(
                 content_type=ContentType.objects.get_for_model(obj),
                 object_id=obj.id,
-                user=request.user
+                user=request.user,
             )
             if vote_object.vote is not self.vote_type:
                 vote_object.vote = self.vote_type
-                vote_object.save(update_fields=['vote'])
-                self.create_vote_notifiction(obj)
+                vote_object.save(update_fields=["vote"])
+                self.create_vote_notification(obj)
             else:
                 vote_object.delete()
         except ObjectDoesNotExist:
             obj.votes.create(user=request.user, vote=self.vote_type)
-            self.create_vote_notifiction(obj)
+            self.create_vote_notification(obj)
 
         data = {
-            'vote_type': self.vote_type,
-            'total_likes': obj.votes.count_likes(),
-            'total_dislikes': obj.votes.count_dislikes(),
+            "vote_type": self.vote_type,
+            "total_likes": obj.votes.count_likes(),
+            "total_dislikes": obj.votes.count_dislikes(),
         }
 
         return JsonResponse(data)
 
-    def create_vote_notifiction(self, obj: Model) -> Notification:
+    def create_vote_notification(self, obj: Model) -> Notification:
         notification = Notification.objects.create(
             from_user=self.request.user,
             to_user=obj.author,
             target_content_type=ContentType.objects.get_for_model(obj),
             target_object_id=obj.id,
             message=self.get_vote_notification_message(obj),
-            url=obj.get_absolute_url()
+            url=obj.get_absolute_url(),
         )
         return notification
 
     def get_vote_notification_message(self, obj: Model) -> str:
         if self.model is Question:
-            target = 'вопрос ' + obj.title
+            target = "вопрос " + obj.title
         elif self.model is Answer:
-            target = 'ответ на вопрос ' + obj.question.title
+            target = "ответ на вопрос " + obj.question.title
 
         if self.vote_type == 1:
-            action = 'понравился'
+            action = "понравился"
         else:
-            action = 'не понравился'
-            
-        return f'Пользователю {self.request.user.username} {action} ваш {target}.'
+            action = "не понравился"
+
+        return f"Пользователю {self.request.user.username} {action} ваш {target}."

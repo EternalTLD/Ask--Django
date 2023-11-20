@@ -32,7 +32,8 @@ $( document ).ready(function() {
     const dislikeForm = $(`#vote-dislike-form${pk}`);
     const likeCounter = document.getElementById(`total-likes${pk}`);
     const dislikeCounter = document.getElementById(`total-dislikes${pk}`);
-    const domain = window.location.origin
+    const domain = window.location.origin;
+
     likeForm.on("submit", function(e) {
         e.preventDefault();
         e.stopImmediatePropagation();
@@ -75,7 +76,7 @@ $( document ).ready(function() {
                 likeCounter.innerHTML = response.total_likes;
                 dislikeCounter.innerHTML = response.total_dislikes;
             },
-
+            
         });
     });
 

@@ -6,105 +6,170 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('questions', '0003_remove_question_category_delete_category'),
+        ("questions", "0003_remove_question_category_delete_category"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='AnswerVote',
+            name="AnswerVote",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('vote', models.SmallIntegerField(choices=[(1, 'like'), (-1, 'dislike')], verbose_name='Голос')),
-                ('voted_at', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "vote",
+                    models.SmallIntegerField(
+                        choices=[(1, "like"), (-1, "dislike")], verbose_name="Голос"
+                    ),
+                ),
+                ("voted_at", models.DateTimeField(auto_now_add=True)),
             ],
         ),
         migrations.CreateModel(
-            name='QuestionVote',
+            name="QuestionVote",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('vote', models.SmallIntegerField(choices=[(1, 'like'), (-1, 'dislike')], verbose_name='Голос')),
-                ('voted_at', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "vote",
+                    models.SmallIntegerField(
+                        choices=[(1, "like"), (-1, "dislike")], verbose_name="Голос"
+                    ),
+                ),
+                ("voted_at", models.DateTimeField(auto_now_add=True)),
             ],
         ),
         migrations.AlterModelOptions(
-            name='answer',
-            options={'ordering': ['-date_published'], 'verbose_name': 'Ответ', 'verbose_name_plural': 'Ответы'},
+            name="answer",
+            options={
+                "ordering": ["-date_published"],
+                "verbose_name": "Ответ",
+                "verbose_name_plural": "Ответы",
+            },
         ),
         migrations.RemoveIndex(
-            model_name='answer',
-            name='questions_a_likes_8eba13_idx',
+            model_name="answer",
+            name="questions_a_likes_8eba13_idx",
         ),
         migrations.RemoveField(
-            model_name='answer',
-            name='dislikes',
+            model_name="answer",
+            name="dislikes",
         ),
         migrations.RemoveField(
-            model_name='answer',
-            name='likes',
+            model_name="answer",
+            name="likes",
         ),
         migrations.RemoveField(
-            model_name='question',
-            name='dislikes',
+            model_name="question",
+            name="dislikes",
         ),
         migrations.RemoveField(
-            model_name='question',
-            name='likes',
+            model_name="question",
+            name="likes",
         ),
         migrations.AlterField(
-            model_name='answer',
-            name='author',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='answers', to=settings.AUTH_USER_MODEL, verbose_name='Пользователь'),
+            model_name="answer",
+            name="author",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="answers",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Пользователь",
+            ),
         ),
         migrations.AlterField(
-            model_name='question',
-            name='author',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='questions', to=settings.AUTH_USER_MODEL, verbose_name='Пользователь'),
+            model_name="question",
+            name="author",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="questions",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Пользователь",
+            ),
         ),
         migrations.AlterField(
-            model_name='question',
-            name='slug',
+            model_name="question",
+            name="slug",
             field=models.SlugField(),
         ),
         migrations.AlterField(
-            model_name='question',
-            name='title',
-            field=models.CharField(help_text='Максимальная длина - 25 символов.', max_length=25, verbose_name='Заголовок'),
+            model_name="question",
+            name="title",
+            field=models.CharField(
+                help_text="Максимальная длина - 25 символов.",
+                max_length=25,
+                verbose_name="Заголовок",
+            ),
         ),
         migrations.AddIndex(
-            model_name='answer',
-            index=models.Index(fields=['-date_published'], name='questions_a_date_pu_8e5856_idx'),
+            model_name="answer",
+            index=models.Index(
+                fields=["-date_published"], name="questions_a_date_pu_8e5856_idx"
+            ),
         ),
         migrations.AddField(
-            model_name='questionvote',
-            name='question',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='questions.question'),
+            model_name="questionvote",
+            name="question",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="questions.question"
+            ),
         ),
         migrations.AddField(
-            model_name='questionvote',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="questionvote",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddField(
-            model_name='answervote',
-            name='answer',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='questions.answer'),
+            model_name="answervote",
+            name="answer",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="questions.answer"
+            ),
         ),
         migrations.AddField(
-            model_name='answervote',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="answervote",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddField(
-            model_name='answer',
-            name='votes',
-            field=models.ManyToManyField(blank=True, related_name='answer_user', through='questions.AnswerVote', to=settings.AUTH_USER_MODEL, verbose_name='Голос'),
+            model_name="answer",
+            name="votes",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="answer_user",
+                through="questions.AnswerVote",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Голос",
+            ),
         ),
         migrations.AddField(
-            model_name='question',
-            name='votes',
-            field=models.ManyToManyField(blank=True, related_name='question_user', through='questions.QuestionVote', to=settings.AUTH_USER_MODEL, verbose_name='Голос'),
+            model_name="question",
+            name="votes",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="question_user",
+                through="questions.QuestionVote",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Голос",
+            ),
         ),
     ]

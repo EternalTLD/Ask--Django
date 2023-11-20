@@ -7,31 +7,79 @@ import django.utils.timezone
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('questions', '0006_alter_answerimages_image_alter_questionimages_image'),
+        ("questions", "0006_alter_answerimages_image_alter_questionimages_image"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Notification',
+            name="Notification",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(default=django.utils.timezone.now, verbose_name='Отправлено')),
-                ('read_at', models.DateTimeField(default=None, verbose_name='Прочитано')),
-                ('type', models.CharField(choices=[('QL', 'Question like'), ('AL', 'Answer like'), ('AQ', 'Answer to question')], max_length=2)),
-                ('from_user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='_notifications', to=settings.AUTH_USER_MODEL, verbose_name='От пользователя')),
-                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='questions.question', verbose_name='Вопрос')),
-                ('to_user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='notifications', to=settings.AUTH_USER_MODEL, verbose_name='К пользователю')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now, verbose_name="Отправлено"
+                    ),
+                ),
+                (
+                    "read_at",
+                    models.DateTimeField(default=None, verbose_name="Прочитано"),
+                ),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[
+                            ("QL", "Question like"),
+                            ("AL", "Answer like"),
+                            ("AQ", "Answer to question"),
+                        ],
+                        max_length=2,
+                    ),
+                ),
+                (
+                    "from_user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="_notifications",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="От пользователя",
+                    ),
+                ),
+                (
+                    "question",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="questions.question",
+                        verbose_name="Вопрос",
+                    ),
+                ),
+                (
+                    "to_user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="notifications",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="К пользователю",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Уведомление',
-                'verbose_name_plural': 'Уведомления',
-                'ordering': ['-created_at'],
-                'unique_together': {('from_user', 'to_user')},
+                "verbose_name": "Уведомление",
+                "verbose_name_plural": "Уведомления",
+                "ordering": ["-created_at"],
+                "unique_together": {("from_user", "to_user")},
             },
         ),
     ]

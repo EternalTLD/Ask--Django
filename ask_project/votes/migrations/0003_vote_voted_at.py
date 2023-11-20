@@ -5,15 +5,16 @@ import django.utils.timezone
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('votes', '0002_remove_vote_voted_at'),
+        ("votes", "0002_remove_vote_voted_at"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='vote',
-            name='voted_at',
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name='Дата'),
+            model_name="vote",
+            name="voted_at",
+            field=models.DateTimeField(
+                default=django.utils.timezone.now, verbose_name="Дата"
+            ),
         ),
     ]

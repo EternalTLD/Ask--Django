@@ -6,25 +6,34 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('notifications', '0003_alter_notification_read_at'),
+        ("notifications", "0003_alter_notification_read_at"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='notification',
+            name="notification",
             unique_together=set(),
         ),
         migrations.AlterField(
-            model_name='notification',
-            name='from_user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='sent_notifications', to=settings.AUTH_USER_MODEL, verbose_name='Отправитель'),
+            model_name="notification",
+            name="from_user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="sent_notifications",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Отправитель",
+            ),
         ),
         migrations.AlterField(
-            model_name='notification',
-            name='to_user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='recieved_notifications', to=settings.AUTH_USER_MODEL, verbose_name='Получатель'),
+            model_name="notification",
+            name="to_user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="recieved_notifications",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Получатель",
+            ),
         ),
     ]

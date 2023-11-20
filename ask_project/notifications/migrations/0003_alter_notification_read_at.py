@@ -4,15 +4,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notifications', '0002_alter_notification_read_at'),
+        ("notifications", "0002_alter_notification_read_at"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='notification',
-            name='read_at',
-            field=models.DateTimeField(blank=True, default=None, null=True, verbose_name='Прочитано'),
+            model_name="notification",
+            name="read_at",
+            field=models.DateTimeField(
+                blank=True, default=None, null=True, verbose_name="Прочитано"
+            ),
         ),
     ]

@@ -4,43 +4,42 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('questions', '0007_rename_obj_answervote_vote_target_and_more'),
+        ("questions", "0007_rename_obj_answervote_vote_target_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='answervote',
-            name='user',
+            model_name="answervote",
+            name="user",
         ),
         migrations.RemoveField(
-            model_name='answervote',
-            name='vote_target',
+            model_name="answervote",
+            name="vote_target",
         ),
         migrations.RemoveField(
-            model_name='questionvote',
-            name='user',
+            model_name="questionvote",
+            name="user",
         ),
         migrations.RemoveField(
-            model_name='questionvote',
-            name='vote_target',
+            model_name="questionvote",
+            name="vote_target",
         ),
         migrations.RemoveField(
-            model_name='answer',
-            name='votes',
+            model_name="answer",
+            name="votes",
         ),
         migrations.RemoveField(
-            model_name='question',
-            name='votes',
+            model_name="question",
+            name="votes",
         ),
         migrations.DeleteModel(
-            name='AnswerImages',
+            name="AnswerImages",
         ),
         migrations.DeleteModel(
-            name='AnswerVote',
+            name="AnswerVote",
         ),
         migrations.DeleteModel(
-            name='QuestionVote',
+            name="QuestionVote",
         ),
     ]

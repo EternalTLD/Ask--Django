@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notifications', '0008_notification_sent'),
+        ("notifications", "0008_notification_sent"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='notification',
-            name='url',
-            field=models.URLField(null=True, verbose_name='URL'),
+            model_name="notification",
+            name="url",
+            field=models.URLField(null=True, verbose_name="URL"),
         ),
     ]

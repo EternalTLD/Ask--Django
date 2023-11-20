@@ -7,14 +7,16 @@ from profiles.models import Profile
 class QuestionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
-        fields = '__all__'
+        fields = "__all__"
+
 
 class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
-        fields = '__all__'
+        fields = "__all__"
+
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = '__all__'
+        fields = "__all__"

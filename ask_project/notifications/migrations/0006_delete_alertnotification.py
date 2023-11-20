@@ -4,13 +4,15 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notifications', '0005_remove_notification_read_at_notification_is_read_and_more'),
+        (
+            "notifications",
+            "0005_remove_notification_read_at_notification_is_read_and_more",
+        ),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='AlertNotification',
+            name="AlertNotification",
         ),
     ]

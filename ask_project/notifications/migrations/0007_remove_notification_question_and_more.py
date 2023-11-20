@@ -5,34 +5,39 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
-        ('notifications', '0006_delete_alertnotification'),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("notifications", "0006_delete_alertnotification"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='notification',
-            name='question',
+            model_name="notification",
+            name="question",
         ),
         migrations.RemoveField(
-            model_name='notification',
-            name='type',
+            model_name="notification",
+            name="type",
         ),
         migrations.AddField(
-            model_name='notification',
-            name='message',
-            field=models.CharField(null=True, verbose_name='Сообщение'),
+            model_name="notification",
+            name="message",
+            field=models.CharField(null=True, verbose_name="Сообщение"),
         ),
         migrations.AddField(
-            model_name='notification',
-            name='target_content_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='notification_target', to='contenttypes.contenttype'),
+            model_name="notification",
+            name="target_content_type",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="notification_target",
+                to="contenttypes.contenttype",
+            ),
         ),
         migrations.AddField(
-            model_name='notification',
-            name='target_object_id',
+            model_name="notification",
+            name="target_object_id",
             field=models.PositiveIntegerField(blank=True, null=True),
         ),
     ]

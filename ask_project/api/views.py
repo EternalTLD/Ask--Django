@@ -9,9 +9,11 @@ class QuestionsListAPIView(ListAPIView):
     queryset = Question.published.all()
     serializer_class = QuestionsSerializer
 
+
 class AnswersListAPIView(ListAPIView):
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
+
 
 class ProfilesListAPIView(ListAPIView):
     queryset = Profile.objects.all()

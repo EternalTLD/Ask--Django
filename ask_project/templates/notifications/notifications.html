@@ -39,42 +39,8 @@
     </div>
 </div>
 <div class="col-3">
-    {% include 'layout/tags.html' %}          
+    {% include 'layout/popular_tags.html' %}          
 </div>
 
-<script>
-    const notificationList = document.getElementById('notification-list');
-    const notificationSocket = new WebSocket(
-        'ws://'
-        + window.location.host
-        + '/ws/notifications/'
-        + '{{request.user.username}}'
-        + '/'
-    );
 
-    notificationSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-        notificationList.insertAdjacentHTML(
-            'afterbegin',
-            '<div class="card text-dark bg-light mb-3 mt-3">' +
-                '<div class="d-flex flex-row g-0">' +
-                    '<div class="d-flex flex-column">' +
-                        '<a href=' + data['url'] + '>' +
-                            '<div class="p-3">' +
-                                '<h5 id="notification-message" class="card-title">' + data['message'] + '</h5>' +
-                            '</div>' +
-                        '</a>' +
-                        '<div class="p-3 d-flex">' +
-                            '<p class="card-text">' + data['created_at'] + '</p>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>' +
-            '</div>'
-        );
-    };
-
-    notificationSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
-    };
-</script>
 {% endblock %}
