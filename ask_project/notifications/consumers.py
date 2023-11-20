@@ -46,7 +46,7 @@ class NotificationConsumer(WebsocketConsumer):
                 },
             )
         elif text_data_json["type"] == "read_all_notifications":
-            self.user.recieved_notifications.mark_all_as_read()
+            self.user.received_notifications.mark_all_as_read()
             async_to_sync(self.channel_layer.group_send)(
                 self.notification_group_name,
                 {
@@ -55,7 +55,7 @@ class NotificationConsumer(WebsocketConsumer):
             )
 
     def get_unread_notifications(self) -> QuerySet[Notification]:
-        notifications = self.user.recieved_notifications.unread()
+        notifications = self.user.received_notifications.unread()
         return notifications
 
     def send_notification(self, event) -> None:

@@ -1,7 +1,7 @@
 from typing import Any
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.db.models.query import QuerySet
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.views.generic.list import ListView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -21,13 +21,13 @@ class NotificationsListView(ListView):
 
 class AllNotificationsListView(NotificationsListView):
     def get_queryset(self) -> QuerySet[Notification]:
-        notifications = self.request.user.recieved_notifications.all()
+        notifications = self.request.user.received_notifications.all()
         return notifications
 
 
 class UnreadNotificationsListView(NotificationsListView):
     def get_queryset(self) -> QuerySet[Notification]:
-        notifications = self.request.user.recieved_notifications.unread()
+        notifications = self.request.user.received_notifications.unread()
         return notifications
 
 
@@ -41,6 +41,6 @@ def mark_as_read_view(request, id: int) -> HttpResponseRedirect:
 
 def mark_all_as_read_view(request) -> HttpResponseRedirect:
     if request.method == "POST":
-        request.user.recieved_notifications.mark_all_as_read()
+        request.user.received_notifications.mark_all_as_read()
 
     return redirect("notifications:unread")

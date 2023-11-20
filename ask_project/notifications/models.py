@@ -36,7 +36,7 @@ class Notification(models.Model):
     to_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="recieved_notifications",
+        related_name="received_notifications",
         verbose_name="Получатель",
     )
     created_at = models.DateTimeField(default=timezone.now, verbose_name="Отправлено")
