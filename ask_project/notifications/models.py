@@ -1,8 +1,6 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from asgiref.sync import async_to_sync
@@ -31,35 +29,21 @@ class Notification(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="sent_notifications",
-        verbose_name="Отправитель",
     )
     to_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="received_notifications",
-        verbose_name="Получатель",
     )
-    created_at = models.DateTimeField(default=timezone.now, verbose_name="Отправлено")
-    is_read = models.BooleanField(default=False, verbose_name="Прочитано")
-    sent = models.BooleanField(default=False, verbose_name="Отправлено")
-    message = models.CharField(null=True, verbose_name="Сообщение")
-    url = models.URLField(null=True, verbose_name="URL")
-
-    target_content_type = models.ForeignKey(
-        ContentType,
-        on_delete=models.CASCADE,
-        related_name="notification_target",
-        blank=True,
-        null=True,
-    )
-    target_object_id = models.PositiveIntegerField(blank=True, null=True)
-    target = GenericForeignKey("target_content_type", "target_object_id")
+    created_at = models.DateTimeField(default=timezone.now)
+    is_read = models.BooleanField(default=False)
+    sent = models.BooleanField(default=False)
+    message = models.CharField(null=True, max_length=50)
+    url = models.URLField(null=True)
 
     objects = NotificationManager.as_manager()
 
     class Meta:
-        verbose_name = "Уведомление"
-        verbose_name_plural = "Уведомления"
         ordering = ["created_at"]
 
     def __str__(self) -> str:
