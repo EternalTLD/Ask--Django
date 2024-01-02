@@ -7,7 +7,7 @@
 
       <div class="form-outline w-100">
 
-        <form action="{% url 'questions:question_detail' question.pk question.slug %}" method="post">
+        <form action="{% url 'questions:detail' question.pk question.slug %}" method="post">
             {% csrf_token %}
             <textarea name="content" class="form-control" id="content" rows="4"
             style="background: #fff;" placeholder="Введите ответ..."></textarea>

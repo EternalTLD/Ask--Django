@@ -7,7 +7,7 @@
   <h2 class="text-center">Удалить вопрос?</h2>
   <hr class="border border-2 border-danger">
   <p class="text-center">Вы действительно хотите удалить {{ object }}?</p>
-  <form method="post" action="{% url 'questions:question_delete' question.pk %}">
+  <form method="post" action="{% url 'questions:delete' question.pk %}">
     {% csrf_token %}
     <div class="d-flex justify-content-center pt-3">
         <button type="submit" class="btn btn-danger btn-lg ms-2">Удалить</button>
