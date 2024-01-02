@@ -9,27 +9,21 @@ from django.urls import reverse
 
 class Profile(models.Model):
     """Profile model"""
-
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="profile",
-        verbose_name="Пользователь",
     )
     profile_image = models.ImageField(
-        upload_to="avatars/%Y/%m/%d/", blank=True, null=True, verbose_name="Аватар"
+        upload_to="avatars/%Y/%m/%d/", blank=True, null=True
     )
-    rating = models.IntegerField(default=0, verbose_name="Рейтинг")
-    city = models.CharField(max_length=25, blank=True, verbose_name="Город")
-    country = models.CharField(max_length=25, blank=True, verbose_name="Страна")
-    status = models.CharField(max_length=250, blank=True, verbose_name="Статус")
-
-    class Meta:
-        verbose_name = "Профиль"
-        verbose_name_plural = "Профили"
+    rating = models.IntegerField(default=0)
+    city = models.CharField(max_length=25, blank=True)
+    country = models.CharField(max_length=25, blank=True)
+    status = models.CharField(max_length=250, blank=True)
 
     def __str__(self) -> str:
-        return f"Профиль пользователя {self.user.username}"
+        return f"Profile of {self.user.username}"
 
     def get_profile_image(self) -> str:
         if self.profile_image:
