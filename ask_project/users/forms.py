@@ -1,9 +1,11 @@
 from typing import Any
 
-from django.contrib.auth.forms import UserCreationForm
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import get_user_model
 
-from .models import User
+
+User = get_user_model()
 
 
 class UserRegistrationForm(UserCreationForm):
@@ -21,14 +23,14 @@ class UserRegistrationForm(UserCreationForm):
     def clean_username(self) -> str:
         username = self.cleaned_data["username"]
         if " " in username:
-            raise forms.ValidationError("Имя пользователя не должно содержать пробелы.")
+            raise forms.ValidationError("Username can't contains spaces")
         return username
 
     def clean_email(self) -> str:
         email = self.cleaned_data.get("email")
         if User.objects.filter(email=email):
             raise forms.ValidationError(
-                "Пользователь с таким email-адресом уже зарегистрирован."
+                "This email is already used."
             )
         return email
 
@@ -36,7 +38,7 @@ class UserRegistrationForm(UserCreationForm):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
         if password1 != password2:
-            raise forms.ValidationError("Пароли не совпадают!")
+            raise forms.ValidationError("Password mismatch!")
         return password2
 
     def save(self, commit: bool = True) -> Any:
