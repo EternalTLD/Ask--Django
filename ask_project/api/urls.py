@@ -37,4 +37,5 @@ urlpatterns = [
             }
         ),
     ),
+    path("notifications/", views.NotificationListAPIView.as_view()),
 ]

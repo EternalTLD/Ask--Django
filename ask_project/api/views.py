@@ -1,8 +1,8 @@
-from rest_framework import viewsets
-from rest_framework import permissions
+from rest_framework import viewsets, permissions, generics
 from django.contrib.auth import get_user_model
 
 from questions.models import Question, Answer
+from notifications.models import Notification
 from . import serializers
 from .permissions import IsAuthorOrReadOnly
 
@@ -32,3 +32,12 @@ class AnswerViewSet(viewsets.ModelViewSet):
     queryset = Answer.objects.all()
     serializer_class = serializers.AnswerSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
+
+
+class NotificationListAPIView(generics.ListAPIView):
+    queryset = Notification.objects.all()
+    serializer_class = serializers.NotificationSerializer
+
+    def get_queryset(self):
+        notifications = Notification.objects.filter(to_user=self.request.user)
+        return notifications

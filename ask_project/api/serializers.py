@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 
 from questions.models import Question, Answer
 from profiles.models import Profile
+from notifications.models import Notification
 
 
 User = get_user_model()
@@ -87,3 +88,15 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     def get_url(self, instance):
         return self.context["request"].build_absolute_uri(instance.get_absolute_url())
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField()
+    from_user = serializers.StringRelatedField()
+
+    class Meta:
+        model = Notification
+        exclude = ["to_user"]
+
+    def get_url(self, instance):
+        return self.context["request"].build_absolute_uri(instance.url)
