@@ -1,20 +1,34 @@
-from rest_framework.generics import ListAPIView
+from rest_framework import viewsets
+from rest_framework import permissions
+from django.contrib.auth import get_user_model
 
 from questions.models import Question, Answer
-from profiles.models import Profile
-from .serializers import QuestionsSerializer, AnswerSerializer, ProfileSerializer
+from . import serializers
+from .permissions import IsAuthorOrReadOnly
 
 
-class QuestionsListAPIView(ListAPIView):
+User = get_user_model()
+
+
+class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.published.all()
-    serializer_class = QuestionsSerializer
+    serializer_class = serializers.QuestionSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
+
+    def retrieve(self, request, *args, **kwargs):
+        question = self.get_object()
+        question.views += 1
+        question.save()
+        return super().retrieve(request, *args, **kwargs)
 
 
-class AnswersListAPIView(ListAPIView):
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = serializers.UserSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
+
+
+class AnswerViewSet(viewsets.ModelViewSet):
     queryset = Answer.objects.all()
-    serializer_class = AnswerSerializer
-
-
-class ProfilesListAPIView(ListAPIView):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+    serializer_class = serializers.AnswerSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
