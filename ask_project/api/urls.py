@@ -1,12 +1,40 @@
 from django.urls import path
 
-from .views import QuestionsListAPIView, AnswersListAPIView, ProfilesListAPIView
+from . import views
 
 
 app_name = "api"
 
 urlpatterns = [
-    path("questions_list/", QuestionsListAPIView.as_view()),
-    path("answers_list/", AnswersListAPIView.as_view()),
-    path("profiles_list/", ProfilesListAPIView.as_view()),
+    path(
+        "questions/", views.QuestionViewSet.as_view({"get": "list", "post": "create"})
+    ),
+    path(
+        "questions/<int:pk>/",
+        views.QuestionViewSet.as_view(
+            {
+                "get": "retrieve",
+                "put": "update",
+                "patch": "partial_update",
+                "delete": "destroy",
+            }
+        ),
+    ),
+    path("users/", views.UserViewSet.as_view({"get": "list"})),
+    path(
+        "users/<int:pk>/",
+        views.UserViewSet.as_view({"get": "retrieve", "put": "update"}),
+    ),
+    path("answers/", views.AnswerViewSet.as_view({"get": "list"})),
+    path(
+        "answers/<int:pk>/",
+        views.AnswerViewSet.as_view(
+            {
+                "get": "retrieve",
+                "put": "update",
+                "patch": "partial_update",
+                "delete": "destroy",
+            }
+        ),
+    ),
 ]
