@@ -5,14 +5,14 @@ from taggit.serializers import TaggitSerializer, TagListSerializerField
 from questions.models import Question, Answer
 from profiles.models import Profile
 from notifications.models import Notification
-from .mixins import VoteCountFieldMixin
+from .mixins import VoteCountFieldMixin, URIFieldMixin
 
 
 User = get_user_model()
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    """User profile serializer"""
+    """Serializer for the Profile model."""
 
     class Meta:
         model = Profile
@@ -21,7 +21,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """User serializer"""
+    """Serializer for the User model with associated Profile."""
 
     profile = ProfileSerializer()
 
@@ -40,18 +40,18 @@ class UserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.first_name = validated_data.get("first_name", instance.first_name)
         instance.last_name = validated_data.pop("last_name", instance.last_name)
-        if hasattr(instance, "profile"):
-            profile_data = validated_data.pop("profile", {})
-            for k, v in profile_data.items():
-                setattr(instance.profile, k, v)
+        profile_data = validated_data.pop("profile", {})
+        instance.profile, _ = Profile.objects.get_or_create(user=instance)
+        for k, v in profile_data.items():
+            setattr(instance.profile, k, v)
+        instance.profile.save()
         instance.save()
         return instance
 
 
-class AnswerSerializer(VoteCountFieldMixin, serializers.ModelSerializer):
-    """Answer serializer"""
+class AnswerSerializer(URIFieldMixin, VoteCountFieldMixin, serializers.ModelSerializer):
+    """Serializer for the Answer model."""
 
-    question_url = serializers.SerializerMethodField()
     author = UserSerializer(read_only=True)
 
     class Meta:
@@ -59,14 +59,15 @@ class AnswerSerializer(VoteCountFieldMixin, serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = ["date_published", "best_answer", "active"]
 
-    def get_question_url(self, instance):
-        return self.context["request"].build_absolute_uri(instance.get_absolute_url())
 
+class QuestionSerializer(
+    URIFieldMixin,
+    VoteCountFieldMixin,
+    TaggitSerializer,
+    serializers.ModelSerializer,
+):
+    """Serializer for the Question model."""
 
-class QuestionSerializer(VoteCountFieldMixin, TaggitSerializer, serializers.ModelSerializer):
-    """Question serializer"""
-
-    url = serializers.SerializerMethodField()
     answers = AnswerSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
     tags = TagListSerializerField()
@@ -75,7 +76,6 @@ class QuestionSerializer(VoteCountFieldMixin, TaggitSerializer, serializers.Mode
         model = Question
         fields = "__all__"
         read_only_fields = [
-            "url",
             "date_published",
             "date_created",
             "date_updated",
@@ -83,17 +83,12 @@ class QuestionSerializer(VoteCountFieldMixin, TaggitSerializer, serializers.Mode
             "slug",
         ]
 
-    def get_url(self, instance):
-        return self.context["request"].build_absolute_uri(instance.get_absolute_url())
 
+class NotificationSerializer(URIFieldMixin, serializers.ModelSerializer):
+    """Serializer for the Notification model."""
 
-class NotificationSerializer(serializers.ModelSerializer):
-    url = serializers.SerializerMethodField()
     from_user = serializers.StringRelatedField()
 
     class Meta:
         model = Notification
-        exclude = ["to_user"]
-
-    def get_url(self, instance):
-        return self.context["request"].build_absolute_uri(instance.url)
+        exclude = ["to_user", "url"]
