@@ -6,6 +6,11 @@ from . import views
 app_name = "api"
 
 urlpatterns = [
+    path("users/", views.UserViewSet.as_view({"get": "list"})),
+    path(
+        "users/<int:pk>/",
+        views.UserViewSet.as_view({"get": "retrieve", "put": "update"}),
+    ),
     path(
         "questions/", views.QuestionViewSet.as_view({"get": "list", "post": "create"})
     ),
@@ -19,11 +24,6 @@ urlpatterns = [
                 "delete": "destroy",
             }
         ),
-    ),
-    path("users/", views.UserViewSet.as_view({"get": "list"})),
-    path(
-        "users/<int:pk>/",
-        views.UserViewSet.as_view({"get": "retrieve", "put": "update"}),
     ),
     path("answers/", views.AnswerViewSet.as_view({"get": "list"})),
     path(

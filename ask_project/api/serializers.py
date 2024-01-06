@@ -5,6 +5,7 @@ from taggit.serializers import TaggitSerializer, TagListSerializerField
 from questions.models import Question, Answer
 from profiles.models import Profile
 from notifications.models import Notification
+from .mixins import VoteCountFieldMixin
 
 
 User = get_user_model()
@@ -34,7 +35,7 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "profile",
         ]
-        read_only_fields = ["username", "email", "questions", "answers"]
+        read_only_fields = ["username"]
 
     def update(self, instance, validated_data):
         instance.first_name = validated_data.get("first_name", instance.first_name)
@@ -47,22 +48,22 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
-class AnswerSerializer(serializers.ModelSerializer):
+class AnswerSerializer(VoteCountFieldMixin, serializers.ModelSerializer):
     """Answer serializer"""
 
     question_url = serializers.SerializerMethodField()
-    author = serializers.PrimaryKeyRelatedField(read_only=True)
+    author = UserSerializer(read_only=True)
 
     class Meta:
         model = Answer
         fields = "__all__"
-        read_only_fields = ["date_published", "best_answer", "active", "url"]
+        read_only_fields = ["date_published", "best_answer", "active"]
 
     def get_question_url(self, instance):
         return self.context["request"].build_absolute_uri(instance.get_absolute_url())
 
 
-class QuestionSerializer(TaggitSerializer, serializers.ModelSerializer):
+class QuestionSerializer(VoteCountFieldMixin, TaggitSerializer, serializers.ModelSerializer):
     """Question serializer"""
 
     url = serializers.SerializerMethodField()
@@ -75,14 +76,11 @@ class QuestionSerializer(TaggitSerializer, serializers.ModelSerializer):
         fields = "__all__"
         read_only_fields = [
             "url",
-            "author",
             "date_published",
             "date_created",
             "date_updated",
             "views",
             "slug",
-            "answers",
-            "tags"
         ]
 
     def get_url(self, instance):
