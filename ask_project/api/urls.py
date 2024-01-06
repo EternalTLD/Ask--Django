@@ -9,7 +9,9 @@ urlpatterns = [
     path("users/", views.UserViewSet.as_view({"get": "list"})),
     path(
         "users/<int:pk>/",
-        views.UserViewSet.as_view({"get": "retrieve", "put": "update"}),
+        views.UserViewSet.as_view(
+            {"get": "retrieve", "put": "update", "patch": "partial_update"}
+        ),
     ),
     path(
         "questions/", views.QuestionViewSet.as_view({"get": "list", "post": "create"})
