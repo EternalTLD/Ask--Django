@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from taggit.serializers import TaggitSerializer, TagListSerializerField
 
 from questions.models import Question, Answer
 from profiles.models import Profile
@@ -22,8 +23,6 @@ class UserSerializer(serializers.ModelSerializer):
     """User serializer"""
 
     profile = ProfileSerializer()
-    questions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    answers = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = User
@@ -34,8 +33,6 @@ class UserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "profile",
-            "questions",
-            "answers",
         ]
         read_only_fields = ["username", "email", "questions", "answers"]
 
@@ -65,12 +62,13 @@ class AnswerSerializer(serializers.ModelSerializer):
         return self.context["request"].build_absolute_uri(instance.get_absolute_url())
 
 
-class QuestionSerializer(serializers.ModelSerializer):
+class QuestionSerializer(TaggitSerializer, serializers.ModelSerializer):
     """Question serializer"""
 
     url = serializers.SerializerMethodField()
-    answers = AnswerSerializer(many=True)
-    author = UserSerializer()
+    answers = AnswerSerializer(many=True, read_only=True)
+    author = UserSerializer(read_only=True)
+    tags = TagListSerializerField()
 
     class Meta:
         model = Question
@@ -84,6 +82,7 @@ class QuestionSerializer(serializers.ModelSerializer):
             "views",
             "slug",
             "answers",
+            "tags"
         ]
 
     def get_url(self, instance):
