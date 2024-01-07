@@ -1,3 +1,7 @@
-from django.contrib import admin
+from django.contrib.contenttypes.admin import GenericStackedInline
 
-# Register your models here.
+from .models import Vote
+
+
+class VoteAdmin(GenericStackedInline):
+    model = Vote
