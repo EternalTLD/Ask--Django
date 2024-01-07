@@ -18,25 +18,28 @@ class VoteManager(models.Manager):
         dislikes = self.get_queryset().filter(vote=-1).count()
         return dislikes
 
+    def has_user_voted(self, user):
+        """Check if the user has voted for the object"""
+        return self.get_queryset().filter(user=user).exists()
+
 
 class Vote(models.Model):
+    """Vote model for likes and dislikes"""
+
     LIKE = 1
     DISLIKE = -1
     VOTES = ((LIKE, "like"), (DISLIKE, "dislike"))
 
-    vote = models.SmallIntegerField(choices=VOTES, verbose_name="Голос")
+    vote = models.SmallIntegerField(choices=VOTES)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="votes",
-        verbose_name="Пользователь",
     )
-    timestamp = models.DateTimeField(default=timezone.now, verbose_name="Дата")
+    timestamp = models.DateTimeField(default=timezone.now)
 
     content_type = models.ForeignKey(
-        ContentType, 
-        on_delete=models.CASCADE, 
-        related_name="vote_target"
+        ContentType, on_delete=models.CASCADE, related_name="vote_target"
     )
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
