@@ -9,6 +9,7 @@ from django.urls import reverse
 
 class Profile(models.Model):
     """Profile model"""
+
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

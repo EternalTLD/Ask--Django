@@ -5,5 +5,6 @@ from .models import Profile
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ["user", "profile_image", "rating", "country"]
-    raw_id_fields = ["user"]
+    list_display = ["user", "rating", "city", "country"]
+    search_fields = ["user__username", "city", "country"]
+    list_filter = ["city", "country"]
