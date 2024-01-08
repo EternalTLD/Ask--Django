@@ -1,11 +1,7 @@
 from django.contrib import admin
-from django.contrib.contenttypes.admin import GenericStackedInline
 
-from .models import Question, Answer, QuestionImages, Vote
-
-
-class VoteAdmin(GenericStackedInline):
-    model = Vote
+from votes.admin import VoteAdmin
+from .models import Question, Answer, QuestionImages
 
 
 @admin.register(Question)

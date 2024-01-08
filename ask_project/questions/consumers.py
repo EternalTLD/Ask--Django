@@ -1,6 +1,5 @@
 import json
 
-from django.contrib.contenttypes.models import ContentType
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 
@@ -36,7 +35,6 @@ class AnswersConsumer(WebsocketConsumer):
             "author_url": new_answer.author.profile.get_absolute_url(),
             "profile_image": new_answer.author.profile.get_profile_image(),
         }
-        print(data)
 
         async_to_sync(self.channel_layer.group_send)(
             self.question_group_name, {"type": "new_answer", "message": data}
@@ -48,15 +46,13 @@ class AnswersConsumer(WebsocketConsumer):
 
     def create_new_answer(self, text: str) -> Answer:
         question = Question.objects.get(id=int(self.question_id))
-        new_answer = Answer.objects.create(
+        answer = Answer.objects.create(
             question=question, author=self.scope["user"], content=text
         )
         Notification.objects.create(
-            from_user=new_answer.author,
+            from_user=answer.author,
             to_user=question.author,
-            target_content_type=ContentType.objects.get_for_model(question),
-            target_object_id=question.id,
-            message=f"Пользователь {new_answer.author} ответил на вопрос {question}",
+            message=f"New answer on {str(question)}",
             url=question.get_absolute_url(),
         )
-        return new_answer
+        return answer

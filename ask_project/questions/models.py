@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db.models import Count
+from django.utils.text import slugify
 
 from taggit.managers import TaggableManager
 from votes.models import Vote
@@ -28,31 +29,31 @@ class PublishedManager(models.Manager):
         )
         return similar_questions
 
+    def popular(self):
+        """Returns query set of the most popular published questions"""
+        return self.get_queryset().order_by("-views", "-votes")
+
 
 class Question(models.Model):
     """Question model"""
 
     title = models.CharField(
         max_length=25,
-        help_text="Максимальная длина - 25 символов.",
-        verbose_name="Заголовок",
+        help_text="Max length - 25 symbols.",
     )
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="questions",
-        verbose_name="Пользователь",
     )
     votes = GenericRelation(Vote, related_query_name="questions")
-    date_published = models.DateTimeField(
-        default=timezone.now, verbose_name="Дата публикации"
-    )
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
-    date_updated = models.DateTimeField(auto_now=True, verbose_name="Дата изменения")
-    content = models.TextField(verbose_name="Содержание")
-    views = models.IntegerField(default=0, verbose_name="Просмотры")
-    draft = models.BooleanField(default=False, verbose_name="Черновик")
-    slug = models.SlugField(max_length=50)
+    date_published = models.DateTimeField(default=timezone.now)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+    content = models.TextField(max_length=5000)
+    views = models.IntegerField(default=0)
+    draft = models.BooleanField(default=False)
+    slug = models.SlugField(max_length=50, blank=True)
 
     objects = models.Manager()
     published = PublishedManager()
@@ -61,33 +62,25 @@ class Question(models.Model):
     class Meta:
         ordering = ["-date_published"]
         indexes = [
-            models.Index(fields=["-date_published"]),
+            models.Index(fields=["-date_published", "author"]),
         ]
-        verbose_name = "Вопрос"
-        verbose_name_plural = "Вопросы"
 
     def __str__(self) -> str:
         return self.title
 
     def get_absolute_url(self) -> str:
-        return reverse(
-            "questions:question_detail", kwargs={"pk": self.pk, "slug": self.slug}
-        )
+        return reverse("questions:detail", kwargs={"pk": self.pk, "slug": self.slug})
+
+    def save(self, *args, **kwargs) -> None:
+        self.slug = slugify(self.title)
+        return super().save(*args, **kwargs)
 
 
 class QuestionImages(models.Model):
     """Images attached to the question"""
 
-    question = models.ForeignKey(
-        Question, on_delete=models.CASCADE, verbose_name="Вопрос"
-    )
-    image = models.ImageField(
-        blank=True, upload_to="questions_images/%Y/%m/%d/", verbose_name="Картинка"
-    )
-
-    class Meta:
-        verbose_name = "Картинка к вопросу"
-        verbose_name_plural = "Картинки к вопросу"
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    image = models.ImageField(blank=True, upload_to="questions_images/%Y/%m/%d/")
 
 
 class Answer(models.Model):
@@ -97,31 +90,27 @@ class Answer(models.Model):
         Question,
         on_delete=models.CASCADE,
         related_name="answers",
-        verbose_name="Вопрос",
     )
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="answers",
-        verbose_name="Пользователь",
     )
     votes = GenericRelation(Vote, related_query_name="answers")
-    content = models.TextField(verbose_name="Содержание")
-    date_published = models.DateField(auto_now_add=True, verbose_name="Дата публикации")
-    best_answer = models.BooleanField(default=False, verbose_name="Лучший ответ")
-    active = models.BooleanField(default=True, verbose_name="Активный")
+    content = models.TextField(max_length=5000)
+    date_published = models.DateField(auto_now_add=True)
+    best_answer = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ["-date_published"]
-        indexes = [models.Index(fields=["-date_published"])]
-        verbose_name = "Ответ"
-        verbose_name_plural = "Ответы"
+        indexes = [models.Index(fields=["-date_published", "author", "question"])]
 
     def __str__(self) -> str:
-        return f"Ответ {self.author} на вопрос {self.question}"
+        return f"{self.author} gives an answer on {self.question}"
 
     def get_absolute_url(self) -> str:
         return reverse(
-            "questions:question_detail",
+            "questions:detail",
             kwargs={"pk": self.question.pk, "slug": self.question.slug},
         )
