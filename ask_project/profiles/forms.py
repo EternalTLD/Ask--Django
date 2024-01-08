@@ -1,7 +1,7 @@
 from django import forms
 
-from .models import Profile
 from users.models import User
+from .models import Profile
 
 
 class UserEditForm(forms.ModelForm):
