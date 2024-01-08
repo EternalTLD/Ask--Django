@@ -3,30 +3,24 @@ from django.db.models import F
 from django.db.models.query import QuerySet
 from django.utils.text import slugify
 from django.urls import reverse
-from django.http import (
-    HttpRequest,
-    HttpResponse,
-    HttpResponseForbidden,
-    HttpResponseRedirect,
-)
-from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.search import TrigramSimilarity
-from django.views.generic import ListView, DetailView
-from django.views.generic.base import View
-from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import FormView, CreateView, UpdateView, DeleteView
+from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
 from taggit.models import Tag
 from .models import Question, Answer
 from .forms import AnswerForm, QuestionForm, SearchForm
+from .decorators import IsAuthor
+
 
 User = get_user_model()
 
 
-class QuestionsListView(ListView):
+class QuestionsListView(generic.ListView):
     template_name = "questions/index.html"
     queryset = Question.published.all()
     context_object_name = "questions_list"
@@ -34,7 +28,7 @@ class QuestionsListView(ListView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["page_title"] = "Последние вопросы"
+        context["page_title"] = "Last questions"
         return context
 
 
@@ -42,25 +36,24 @@ class QuestionsByTagListView(QuestionsListView):
     def get_queryset(self) -> QuerySet[Question]:
         tag_slug = self.kwargs.get("tag_slug")
         tag = get_object_or_404(Tag, slug=tag_slug)
-        questions_list = get_list_or_404(Question.published.filter(tags__in=[tag]))
-        return questions_list
+        return Question.published.filter(tags__in=[tag])
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["page_title"] = f"Вопросы с тегом {self.kwargs.get('tag_slug')}"
+        context["page_title"] = f"Questions tagged #{self.kwargs.get('tag_slug')}"
         return context
 
 
 class PopularQuestionsListView(QuestionsListView):
-    queryset = Question.published.order_by("-views", "-votes")
+    queryset = Question.published.popular()
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["page_title"] = "Популярные вопросы"
+        context["page_title"] = "Popular questions"
         return context
 
 
-class QuestionDetailView(DetailView):
+class QuestionDetailView(generic.DetailView):
     template_name = "questions/question_detail.html"
     model = Question
     context_object_name = "question"
@@ -76,7 +69,7 @@ class QuestionDetailView(DetailView):
         return context
 
 
-class AnswerFormView(SingleObjectMixin, FormView):
+class AnswerFormView(generic.SingleObjectMixin, generic.FormView):
     template_name = "questions/question_detail.html"
     form_class = AnswerForm
     model = Answer
@@ -86,14 +79,14 @@ class AnswerFormView(SingleObjectMixin, FormView):
         return super().post(request, *args, **kwargs)
 
 
-class QuestionView(View):
+@method_decorator(login_required, name="post")
+class QuestionView(generic.View):
     def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         view = QuestionDetailView.as_view()
         question_id = self.kwargs.get("pk")
         Question.objects.filter(pk=question_id).update(views=F("views") + 1)
         return view(request, *args, **kwargs)
 
-    @method_decorator(login_required)
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         view = AnswerFormView.as_view()
         form = AnswerForm(request.POST)
@@ -105,14 +98,11 @@ class QuestionView(View):
         return view(request, *args, **kwargs)
 
 
-class QuestionCreateView(CreateView):
+@method_decorator(login_required, name="dispatch")
+class QuestionCreateView(generic.CreateView):
     template_name = "questions/question_create_form.html"
     success_url = "/"
     form_class = QuestionForm
-
-    @method_decorator(login_required)
-    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        return super().dispatch(request, *args, **kwargs)
 
     def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         form = QuestionForm(request.POST)
@@ -123,44 +113,35 @@ class QuestionCreateView(CreateView):
             form.save()
         return HttpResponseRedirect(
             reverse(
-                "questions:question_detail",
+                "questions:detail",
                 kwargs={"pk": form.instance.id, "slug": form.instance.slug},
             )
         )
 
 
-class QuestionUpdateView(UpdateView):
+@method_decorator([login_required, IsAuthor], name="dispatch")
+class QuestionUpdateView(generic.UpdateView):
     model = Question
     form_class = QuestionForm
     template_name = "questions/question_update_form.html"
     context_object_name = "question"
 
-    def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        question = self.get_object()
-        if request.user != question.author:
-            return HttpResponseForbidden()
-        return super().dispatch(request, *args, **kwargs)
-
     def get_success_url(self) -> str:
         return self.get_object().get_absolute_url()
 
 
-class QuestionDeleteView(DeleteView):
+@method_decorator([login_required, IsAuthor], name="dispatch")
+class QuestionDeleteView(generic.DeleteView):
     model = Question
     success_url = "/"
     context_object_name = "question"
-
-    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        question = self.get_object()
-        if request.user != question.author:
-            return HttpResponseForbidden()
-        return super().post(request, *args, **kwargs)
 
 
 def question_search_view(request: HttpRequest) -> HttpResponse:
     form = SearchForm()
     query = None
     results = []
+    page_title = "Questions search"
 
     if "query" in request.GET:
         form = SearchForm(request.GET)
@@ -174,7 +155,7 @@ def question_search_view(request: HttpRequest) -> HttpResponse:
                 .filter(similarity__gt=0.1)
                 .order_by("-similarity")
             )
-            page_title = f"Вопросы, содержащие {query}."
+            page_title = f"Questions that contain {query}."
 
     return render(
         request,
