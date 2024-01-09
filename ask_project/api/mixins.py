@@ -8,7 +8,12 @@ from votes.services import create_vote_notification
 
 
 class VoteCountFieldMixin(metaclass=serializers.SerializerMetaclass):
-    """Mixin adds likes and dislikes counter fields"""
+    """
+    Mixin providing serializer fields for counting likes and dislikes.
+
+    This mixin adds two serializer fields (`likes` and `dislikes`) to count the number
+    of likes and dislikes for a given object.
+    """
 
     likes = serializers.SerializerMethodField()
     dislikes = serializers.SerializerMethodField()
@@ -29,7 +34,12 @@ class VoteCountFieldMixin(metaclass=serializers.SerializerMetaclass):
 
 
 class URIFieldMixin(metaclass=serializers.SerializerMetaclass):
-    """Mixin builds an URI of object if object has url field or get_absolute_url method"""
+    """
+    Mixin providing a serializer field for generating URIs.
+
+    This mixin adds a serializer field (`URI`) to generate a URI for an object if it
+    has either a `url` field or a `get_absolute_url` method.
+    """
 
     URI = serializers.SerializerMethodField()
 
@@ -47,6 +57,13 @@ class URIFieldMixin(metaclass=serializers.SerializerMetaclass):
 
 
 class VoteActionsMixin:
+    """
+    Mixin providing like and dislike functionality for objects with voting capability.
+
+    This mixin adds two actions (`add_like` and `add_dislike`) that allow users to
+    vote (like or dislike) for a particular object.
+    """
+
     @action(detail=True, methods=["post", "get"])
     def add_like(self, request, pk):
         return self._vote(request.user, "like")

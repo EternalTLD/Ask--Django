@@ -57,7 +57,7 @@ class AnswerSerializer(URIFieldMixin, VoteCountFieldMixin, serializers.ModelSeri
     class Meta:
         model = Answer
         fields = "__all__"
-        read_only_fields = ["date_published", "best_answer", "active"]
+        read_only_fields = ["date_published", "best_answer", "active", "question"]
 
 
 class QuestionSerializer(
