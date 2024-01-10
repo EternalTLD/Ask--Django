@@ -9,12 +9,11 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.search import TrigramSimilarity
 from django.views import generic
 from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
 
 from taggit.models import Tag
 from .models import Question, Answer
 from .forms import AnswerForm, QuestionForm, SearchForm
-from .decorators import IsAuthor
+from .mixins import AuthorRequiredMixin
 
 
 User = get_user_model()
@@ -79,7 +78,6 @@ class AnswerFormView(generic.detail.SingleObjectMixin, generic.FormView):
         return super().post(request, *args, **kwargs)
 
 
-@method_decorator(login_required, name="post")
 class QuestionView(generic.View):
     def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         view = QuestionDetailView.as_view()
@@ -87,6 +85,7 @@ class QuestionView(generic.View):
         Question.objects.filter(pk=question_id).update(views=F("views") + 1)
         return view(request, *args, **kwargs)
 
+    @login_required
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         view = AnswerFormView.as_view()
         form = AnswerForm(request.POST)
@@ -98,8 +97,7 @@ class QuestionView(generic.View):
         return view(request, *args, **kwargs)
 
 
-@method_decorator(login_required, name="dispatch")
-class QuestionCreateView(generic.CreateView):
+class QuestionCreateView(AuthorRequiredMixin, generic.CreateView):
     template_name = "questions/question_create_form.html"
     success_url = "/"
     form_class = QuestionForm
@@ -119,8 +117,7 @@ class QuestionCreateView(generic.CreateView):
         )
 
 
-@method_decorator([login_required, IsAuthor()], name="dispatch")
-class QuestionUpdateView(generic.UpdateView):
+class QuestionUpdateView(AuthorRequiredMixin, generic.UpdateView):
     model = Question
     form_class = QuestionForm
     template_name = "questions/question_update_form.html"
@@ -130,8 +127,7 @@ class QuestionUpdateView(generic.UpdateView):
         return self.get_object().get_absolute_url()
 
 
-@method_decorator([login_required, IsAuthor()], name="dispatch")
-class QuestionDeleteView(generic.DeleteView):
+class QuestionDeleteView(AuthorRequiredMixin, generic.DeleteView):
     model = Question
     success_url = "/"
     context_object_name = "question"
