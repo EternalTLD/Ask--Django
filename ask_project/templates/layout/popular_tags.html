@@ -2,8 +2,8 @@
 <div class="position-fixed">
     <h2 class="mt-3 p-3 border text-light bg-secondary bg-gradient rounded text-center" style="width: 20rem;">Популярные теги</h2>
     <div class="p-3 border text-light bg-light rounded" style="max-width: 20rem;">
-        {% get_popular_tags as popular_tags %}
-            {% for tag in popular_tags %}
+        {% popular_tags_list as popular_tags_list %}
+            {% for tag in popular_tags_list %}
             <div class="d-flex flex-row" style="padding: .25rem 0rem .25rem;">
                 <div class="d-flex align-items-center">
                     <form action="{% url 'questions:by_tag' tag.slug %}">
@@ -16,7 +16,7 @@
                     x
                 </div>
                 <div class="d-flex align-items-center text-dark">
-                    {{ tag.pk|count_taged_questions }}
+                    {{ tag.total_questions }}
                 </div>
             </div>
             {% endfor %}

@@ -45,7 +45,7 @@ class QuestionsByTagListView(QuestionsListView):
 
 
 class PopularQuestionsListView(QuestionsListView):
-    queryset = Question.published.popular()
+    queryset = Question.published.get_popular_questions()
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -69,7 +69,7 @@ class QuestionDetailView(generic.DetailView):
         return context
 
 
-class AnswerFormView(generic.SingleObjectMixin, generic.FormView):
+class AnswerFormView(generic.detail.SingleObjectMixin, generic.FormView):
     template_name = "questions/question_detail.html"
     form_class = AnswerForm
     model = Answer
@@ -119,7 +119,7 @@ class QuestionCreateView(generic.CreateView):
         )
 
 
-@method_decorator([login_required, IsAuthor], name="dispatch")
+@method_decorator([login_required, IsAuthor()], name="dispatch")
 class QuestionUpdateView(generic.UpdateView):
     model = Question
     form_class = QuestionForm
@@ -130,7 +130,7 @@ class QuestionUpdateView(generic.UpdateView):
         return self.get_object().get_absolute_url()
 
 
-@method_decorator([login_required, IsAuthor], name="dispatch")
+@method_decorator([login_required, IsAuthor()], name="dispatch")
 class QuestionDeleteView(generic.DeleteView):
     model = Question
     success_url = "/"

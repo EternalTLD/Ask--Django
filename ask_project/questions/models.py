@@ -5,8 +5,10 @@ from django.utils import timezone
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db.models import Count
 from django.utils.text import slugify
+from django.core.cache import cache
 
 from taggit.managers import TaggableManager
+from taggit.models import Tag
 from votes.models import Vote
 
 
@@ -19,19 +21,36 @@ class PublishedManager(models.Manager):
 
     def get_similar_questions(self, question, limit=4):
         """Returns query set of published questions similar to a specific question"""
-        question_tags_ids = question.tags.values_list("id", flat=True)
-        similar_questions = (
-            self.get_queryset()
-            .filter(tags__in=question_tags_ids)
-            .exclude(id=question.id)
-            .annotate(same_tags=Count("tags"))
-            .order_by("-same_tags", "-date_published")[:limit]
-        )
+        cache_key = f"similar_questions_{question.id}"
+        similar_questions = cache.get(cache_key)
+        if similar_questions is None:
+            question_tags_ids = question.tags.values_list("id", flat=True)
+            similar_questions = (
+                self.get_queryset()
+                .filter(tags__in=question_tags_ids)
+                .exclude(id=question.id)
+                .annotate(same_tags=Count("tags"))
+                .order_by("-same_tags", "-date_published")[:limit]
+            )
+            cache.set(cache_key, similar_questions, timeout=3600)
         return similar_questions
 
-    def popular(self):
+    def get_popular_questions(self):
         """Returns query set of the most popular published questions"""
         return self.get_queryset().order_by("-views", "-votes")
+
+    def get_popular_tags(self, limit=10):
+        """Returns the most popular tags"""
+        cache_key = "popular_tags_list"
+        tags = cache.get(cache_key)
+        if tags is None:
+            tags = (
+                Tag.objects.filter(question__draft=False)
+                .annotate(total_questions=models.Count("question"))
+                .order_by("-total_questions")[:limit]
+            )
+            cache.set(cache_key, tags, timeout=86400)
+        return tags
 
 
 class Question(models.Model):
