@@ -9,6 +9,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.search import TrigramSimilarity
 from django.views import generic
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from taggit.models import Tag
 from .models import Question, Answer
@@ -85,7 +87,7 @@ class QuestionView(generic.View):
         Question.objects.filter(pk=question_id).update(views=F("views") + 1)
         return view(request, *args, **kwargs)
 
-    @login_required
+    @method_decorator(login_required())
     def post(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         view = AnswerFormView.as_view()
         form = AnswerForm(request.POST)
@@ -97,7 +99,7 @@ class QuestionView(generic.View):
         return view(request, *args, **kwargs)
 
 
-class QuestionCreateView(AuthorRequiredMixin, generic.CreateView):
+class QuestionCreateView(LoginRequiredMixin, generic.CreateView):
     template_name = "questions/question_create_form.html"
     success_url = "/"
     form_class = QuestionForm
