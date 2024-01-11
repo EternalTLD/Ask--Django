@@ -8,27 +8,30 @@ SECRET_KEY = "django-insecure-%6%-pvm4xn7d^_hve^s73gb9ko7e@vaaogtt(7z-x!ovrdtunk
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
 
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Packages
     "bootstrap5",
-    "questions.apps.QuestionsConfig",
-    "users.apps.UsersConfig",
-    "profiles.apps.ProfilesConfig",
-    "notifications.apps.NotificationsConfig",
     "taggit",
     "django.contrib.postgres",
     "rest_framework",
-    "api",
-    "votes",
     "channels",
+    # Apps
+    "api",
+    "questions",
+    "users",
+    "profiles",
+    "notifications",
+    "votes",
 ]
 
 MIDDLEWARE = [
@@ -65,25 +68,52 @@ WSGI_APPLICATION = "ask_project.wsgi.application"
 
 ASGI_APPLICATION = "ask_project.asgi.application"
 
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("redis", 6379)],
+#         },
+#     },
+# }
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("redis://redis:6379/1", 6379)],
+            "hosts": [("127.0.0.1", 6379)],
         },
     },
 }
 
-
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DB_NAME"),
-        "USER": os.environ.get("DB_USER"),
-        "PASSWORD": os.environ.get("DB_PASS"),
-        "HOST": os.environ.get("DB_HOST"),
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "testdb",
     }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'HOST': os.environ.get('DB_HOST'),
+#         'NAME': os.environ.get('DB_NAME'),
+#         'USER': os.environ.get('DB_USER'),
+#         'PASSWORD': os.environ.get('DB_PASS'),
+#     }
+# }
+
+
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django.core.cache.backends.redis.RedisCache",
+#         "LOCATION": "redis://redis:6379",
+#         "OPTIONS": {
+#             "db": "1",
+#         },
+#     }
+# }
 
 
 AUTH_PASSWORD_VALIDATORS = [
