@@ -1,10 +1,6 @@
 const questionId = JSON.parse(document.getElementById('questionId').textContent);
 const answersSocket = new WebSocket(
-    'ws://'
-    + window.location.host
-    + '/questions/'
-    + questionId
-    + '/'
+    'ws://' + window.location.host + '/ws/questions/' + questionId + '/'
 );
 
 answersSocket.onmessage = function (e) {
