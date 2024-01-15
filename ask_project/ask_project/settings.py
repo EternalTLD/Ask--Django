@@ -79,12 +79,12 @@ CHANNEL_LAYERS = {
 
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'HOST': os.environ.get('DB_HOST', "database"),
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASS'),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "HOST": os.environ.get("DB_HOST", "database"),
+        "NAME": os.environ.get("DB_NAME", "dbname"),
+        "USER": os.environ.get("DB_USER", "dbuser"),
+        "PASSWORD": os.environ.get("DB_PASS", "pass"),
     }
 }
 

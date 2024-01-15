@@ -1,5 +1,6 @@
 import os
 
+from django.apps import apps
 from celery import Celery
 
 
@@ -9,4 +10,4 @@ app = Celery("ask_project")
 
 app.config_from_object("django.conf:settings", namespace="CELERY")
 
-app.autodiscover_tasks()
+app.autodiscover_tasks(lambda: [n.name for n in apps.get_app_configs()])
