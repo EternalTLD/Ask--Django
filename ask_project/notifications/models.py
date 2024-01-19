@@ -54,21 +54,10 @@ class Notification(models.Model):
         self.save()
         return True
 
-
-@receiver(post_save, sender=Notification)
-def notification_handler(**kwargs) -> None:
-    """Handler to send notification"""
-    instance = kwargs.pop("instance")
-    if kwargs.pop("created"):
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            f"notification_{instance.to_user.username}",
-            {
-                "type": "send_notification",
-                "notification": {
-                    "message": instance.message,
-                    "created_at": instance.created_at.strftime("%Y-%m-%d %H:%m"),
-                    "url": instance.url,
-                },
-            },
-        )
+    def to_json(self) -> dict:
+        return {
+            "to_user_username": self.to_user.username,
+            "message": self.message,
+            "created_at": self.created_at.strftime("%Y-%m-%d %H:%m"),
+            "url": self.url,
+        }
