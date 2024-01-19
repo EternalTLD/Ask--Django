@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django.contrib.contenttypes.models import ContentType
 
 from votes.models import Vote
-from votes.services import create_vote_notification
+from notifications.services import send_vote_notification
 
 
 class VoteCountFieldMixin(metaclass=serializers.SerializerMetaclass):
@@ -91,11 +91,11 @@ class VoteActionsMixin:
                 response_message = f"{vote} removed"
             else:
                 Vote.objects.filter(pk=vote_object.pk).update(vote=vote_type)
-                create_vote_notification(obj, vote_type, user)
+                send_vote_notification(obj, vote_type, user)
                 response_message = f"{vote} added"
         else:
             obj.votes.create(user=user, vote=vote_type)
-            create_vote_notification(obj, vote_type, user)
+            send_vote_notification(obj, vote_type, user)
             response_message = f"{vote} added"
 
         return Response(

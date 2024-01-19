@@ -4,8 +4,8 @@ from django.shortcuts import get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 
+from notifications.services import send_vote_notification
 from .models import Vote
-from .services import create_vote_notification
 
 
 class VoteView(View):
@@ -27,10 +27,10 @@ class VoteView(View):
                 vote_object.delete()
             else:
                 Vote.objects.filter(pk=vote_object.pk).update(vote=self.vote_type)
-                create_vote_notification(obj, self.vote_type, request.user)
+                send_vote_notification(obj, self.vote_type, request.user)
         else:
             obj.votes.create(user=request.user, vote=self.vote_type)
-            create_vote_notification(obj, self.vote_type, request.user)
+            send_vote_notification(obj, self.vote_type, request.user)
 
         data = {
             "vote_type": self.vote_type,

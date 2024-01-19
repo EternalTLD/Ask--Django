@@ -1,10 +1,12 @@
 from django.db.models import Model
 
-from notifications.models import Notification
+from questions.models import Answer, Question
 from users.models import User
+from notifications.tasks import send_notification_task
+from .models import Notification
 
 
-def create_vote_notification(obj: Model, vote_type: int, user: User) -> Notification:
+def send_vote_notification(obj: Model, vote_type: int, user: User) -> None:
     if not hasattr(obj, "votes"):
         raise AttributeError(f"{obj} does not have votes attribute")
 
@@ -26,4 +28,15 @@ def create_vote_notification(obj: Model, vote_type: int, user: User) -> Notifica
         url=url,
     )
 
-    return notification
+    send_notification_task.delay(notification.to_json())
+
+
+def send_answer_notification(answer: Answer, question: Question) -> None:
+    notification = Notification.objects.create(
+        from_user=answer.author,
+        to_user=question.author,
+        message=f"New answer on {str(question)}",
+        url=question.get_absolute_url(),
+    )
+
+    send_notification_task.delay(notification.to_json())

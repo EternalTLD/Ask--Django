@@ -28,14 +28,7 @@ class NotificationConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         if text_data_json["type"] == "show_unread_push_notifications":
             notifications = self.get_unread_notifications()
-            notifications = [
-                {
-                    "message": notification.message,
-                    "url": notification.url,
-                    "created_at": notification.created_at.strftime("%d-%m-%Y %H:%M"),
-                }
-                for notification in notifications
-            ]
+            notifications = [notification.to_json() for notification in notifications]
 
             async_to_sync(self.channel_layer.group_send)(
                 self.notification_group_name,

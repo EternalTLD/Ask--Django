@@ -3,7 +3,7 @@ import json
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 
-from notifications.models import Notification
+from notifications.services import send_answer_notification
 from .models import Question, Answer
 
 
@@ -49,10 +49,5 @@ class AnswersConsumer(WebsocketConsumer):
         answer = Answer.objects.create(
             question=question, author=self.scope["user"], content=text
         )
-        Notification.objects.create(
-            from_user=answer.author,
-            to_user=question.author,
-            message=f"New answer on {str(question)}",
-            url=question.get_absolute_url(),
-        )
+        send_answer_notification(answer=answer, question=question)
         return answer
