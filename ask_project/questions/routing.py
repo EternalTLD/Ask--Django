@@ -3,5 +3,5 @@ from django.urls import re_path
 from .consumers import AnswersConsumer
 
 questions_websocket_urlpatterns = [
-    re_path(r"ws/questions/(?P<question_id>\d+)/$", AnswersConsumer.as_asgi())
+    re_path(r"ws/questions/(?P<question_id>\d+)/$", AnswersConsumer.as_asgi()),
 ]
