@@ -1,15 +1,15 @@
 version: '3.8'
 
 services:
-  web-app:
+  backend:
     build:
       context: .
-    container_name: "web-app"
+    container_name: "backend"
     command: python -m uvicorn ask_project.asgi:application --host 0.0.0.0 --port 8000 --workers 4
     ports:
       - "8000:8000"
     volumes:
-      - .:/app
+      - app_code:/app
     environment:
       - DB_HOST=database
       - DB_NAME=dbname
@@ -33,7 +33,7 @@ services:
 
   redis:
     image: redis:7.2.1-alpine
-    container_name: "ask_redis"
+    container_name: "redis"
     ports:
       - "6379:6379"
     volumes:
@@ -44,7 +44,9 @@ services:
     build:
       context: .
     container_name: "celery"
-    command: celery --app=ask_project worker -l info -B
+    command: celery -A ask_project worker -l INFO
+    volumes:
+      - app_code:/app
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
       - RESULT_BACKEND_BACKEND=redis://redis:6379/0
@@ -69,3 +71,4 @@ services:
 volumes:
   pg_data:
   redis_data:
+  app_code:
