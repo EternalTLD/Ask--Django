@@ -2,7 +2,10 @@ from django.db.models import Model
 
 from apps.questions.models import Answer, Question
 from apps.users.models import User
-from apps.notifications.tasks import send_notification_task
+from apps.notifications.tasks import (
+    send_notification_task,
+    send_email_notification_task,
+)
 from .models import Notification
 
 
@@ -29,6 +32,7 @@ def send_vote_notification(obj: Model, vote_type: int, user: User) -> None:
     )
 
     send_notification_task.delay(notification.to_json())
+    send_email_notification_task.delay(notification.to_json())
 
 
 def send_answer_notification(answer: Answer, question: Question) -> None:
@@ -40,3 +44,4 @@ def send_answer_notification(answer: Answer, question: Question) -> None:
     )
 
     send_notification_task.delay(notification.to_json())
+    send_email_notification_task.delay(notification.to_json())

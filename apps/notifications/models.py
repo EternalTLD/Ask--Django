@@ -53,6 +53,7 @@ class Notification(models.Model):
     def to_json(self) -> dict:
         return {
             "to_user_username": self.to_user.username,
+            "to_user_email": self.to_user.email,
             "message": self.message,
             "created_at": self.created_at.strftime("%Y-%m-%d %H:%m"),
             "url": self.url,
