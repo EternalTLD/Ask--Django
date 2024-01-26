@@ -6,7 +6,8 @@ __pycache__/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-media
+/static/admin/
+/static/rest_framework/
 
 ### Django.Python Stack ###
 # Byte-compiled / optimized / DLL files
