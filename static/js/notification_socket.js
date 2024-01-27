@@ -91,3 +91,7 @@ document.getElementById("read-all").onclick = function(e) {
 notificationSocket.onclose = function(e) {
     console.error('Notification socket closed unexpectedly');
 };
+
+notificationSocket.onclose = function(e) {
+    console.error('Notification socket closed unexpectedly');
+};
