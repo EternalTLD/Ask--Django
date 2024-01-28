@@ -68,7 +68,6 @@ class QuestionSerializer(
 ):
     """Serializer for the Question model."""
 
-    answers = AnswerSerializer(many=True, read_only=True)
     author = UserSerializer(read_only=True)
     tags = TagListSerializerField()
 
@@ -87,7 +86,7 @@ class QuestionSerializer(
 class NotificationSerializer(URIFieldMixin, serializers.ModelSerializer):
     """Serializer for the Notification model."""
 
-    from_user = serializers.StringRelatedField()
+    sender = UserSerializer(read_only=True, source="from_user")
 
     class Meta:
         model = Notification

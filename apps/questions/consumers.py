@@ -29,6 +29,7 @@ class AnswersConsumer(WebsocketConsumer):
 
         new_answer = self.create_new_answer(answer)
         data = {
+            "id": new_answer.pk,
             "author": new_answer.author.username,
             "date_published": new_answer.date_published.strftime("%d-%m-%Y"),
             "content": new_answer.content,
