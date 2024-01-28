@@ -2,96 +2,136 @@ const notificationList = document.getElementById('notification-list');
 const pushNotificationList = document.getElementById('push-notification-list');
 const notificationCounter = document.getElementById('notification-counter');
 const username = JSON.parse(document.getElementById('username').textContent);
-const notificationSocket = new WebSocket(
-    'ws://'
-    + window.location.host
-    + '/ws/notifications/'
-    + username
-    + '/'
-);
+let notificationSocket;
 
-notificationSocket.onmessage = function(e) {
-    const data = JSON.parse(e.data);
-    if (data['type'] == 'send_notification') {
-        if (notificationList !== null){
-            createNotification(data['notification'])
-        }
-        createPushNotification(data['notification'])
-        notificationCounter.innerHTML = parseInt(notificationCounter.textContent) + 1
-    } else if (data['type'] == 'show_unread_push_notifications') {
-        showUnreadPushNotifications(data['notifications'])
-        notificationCounter.innerHTML = data['count_notifications']
-    } else if (data['type'] == 'read_all_notifications') {
-        pushNotificationList.innerHTML = '';
-        notificationCounter.innerHTML = '0'
-    }
+
+if (username !== '') {
+    notificationSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/notifications/'
+        + username
+        + '/'
+    );
+
+    notificationSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        if (data['type'] == 'send_notification') {
+            if (notificationList !== null) {
+                createNotification(data['notification']);
+            };
+            if (pushNotificationList !== null) {
+                createPushNotification(data['notification']);
+            };
+            notificationCounter.innerHTML = parseInt(notificationCounter.textContent) + 1;
+
+        } else if (data['type'] == 'show_unread_push_notifications') {
+            showUnreadPushNotifications(data['notifications']);
+            notificationCounter.innerHTML = data['count_notifications'];
+
+        } else if (data['type'] == 'read_all_notifications') {
+            pushNotificationList.innerHTML = '';
+            notificationCounter.innerHTML = '0';
+
+        };
+    };
+
+    notificationSocket.onopen = function(e) {
+        notificationSocket.send(JSON.stringify(
+            {
+                'type': 'show_unread_push_notifications'
+            }
+        ));
+    };
+
+    notificationSocket.onclose = function(e) {
+        console.error('Notification socket closed unexpectedly');
+    };
+
+    function showUnreadPushNotifications(data) {
+        for (const notification of data) {
+            createPushNotification(notification);
+        };
+    };
+    
+    document.getElementById("read-all").onclick = function(e) {
+        e.preventDefault();
+        notificationSocket.send(JSON.stringify(
+            {
+                'type': 'read_all_notifications'
+            }
+        ))
+    };
+
 };
 
-notificationSocket.onopen = function(e) {
-    notificationSocket.send(JSON.stringify(
-        {
-            'type': 'show_unread_push_notifications'
-        }
-    ));
-};
 
 function createNotification(data) {
-    notificationList.insertAdjacentHTML(
-        'afterbegin',
-        '<div class="card text-dark bg-light mb-3 mt-3">' +
-            '<div class="d-flex flex-row g-0">' +
-                '<div class="d-flex flex-column">' +
-                    '<a href=' + data['url'] + '>' +
-                        '<div class="p-3">' +
-                            '<h5 id="notification-message" class="card-title">' + data['message'] + '</h5>' +
-                        '</div>' +
-                    '</a>' +
-                    '<div class="p-3 d-flex">' +
-                        '<p class="card-text">' + data['created_at'] + '</p>' +
-                    '</div>' +
-                '</div>' +
-            '</div>' +
-        '</div>'
-    );
-}
+    var cardDiv = document.createElement('div');
+    cardDiv.className = 'card text-dark bg-light mb-3 mt-3';
+
+    var flexRowDiv = document.createElement('div');
+    flexRowDiv.className = 'd-flex flex-row g-0';
+
+    var flexColumnDiv = document.createElement('div');
+    flexColumnDiv.className = 'd-flex flex-column';
+
+    var link = document.createElement('a');
+    link.href = data['url'];
+
+    var messageDiv = document.createElement('div');
+    messageDiv.className = 'p-3';
+
+    var messageHeading = document.createElement('h5');
+    messageHeading.id = 'notification-message';
+    messageHeading.className = 'card-title';
+    messageHeading.textContent = data['message'];
+
+    messageDiv.appendChild(messageHeading);
+    link.appendChild(messageDiv);
+
+    var dateDiv = document.createElement('div');
+    dateDiv.className = 'p-3 d-flex';
+
+    var dateParagraph = document.createElement('p');
+    dateParagraph.className = 'card-text';
+    dateParagraph.textContent = data['created_at'];
+
+    dateDiv.appendChild(dateParagraph);
+
+    flexColumnDiv.appendChild(link);
+    flexColumnDiv.appendChild(dateDiv);
+
+    flexRowDiv.appendChild(flexColumnDiv);
+    cardDiv.appendChild(flexRowDiv);
+
+    notificationList.insertAdjacentElement('afterbegin', cardDiv);
+};
+
 
 function createPushNotification(data) {
-    pushNotificationList.insertAdjacentHTML(
-        'afterbegin',
-        '<li>' +
-            '<a class="dropdown-item" href=' + data['url'] + '>' +
-                '<p class="d-flex flex-column">' + 
-                    '<small class="text-muted">' +
-                        data['message'] +
-                    '</small>' + 
-                    '<small class="text-muted">' +
-                        data['created_at'] +
-                    '</small>' + 
-                '</p>' +
-            '</a>' +
-        '</li>'
-    );
-};
+    var listItem = document.createElement('li');
 
-function showUnreadPushNotifications(data) {
-    for (const notification of data) {
-        createPushNotification(notification);
-    };
-};
+    var link = document.createElement('a');
+    link.className = 'dropdown-item';
+    link.href = data['url'];
 
-document.getElementById("read-all").onclick = function(e) {
-    e.preventDefault();
-    notificationSocket.send(JSON.stringify(
-        {
-            'type': 'read_all_notifications'
-        }
-    ))
-};
+    var columnDiv = document.createElement('div');
+    columnDiv.className = 'd-flex flex-column';
 
-notificationSocket.onclose = function(e) {
-    console.error('Notification socket closed unexpectedly');
-};
+    var messageSmall = document.createElement('small');
+    messageSmall.className = 'text-muted';
+    messageSmall.textContent = data['message'];
 
-notificationSocket.onclose = function(e) {
-    console.error('Notification socket closed unexpectedly');
+    var dateSmall = document.createElement('small');
+    dateSmall.className = 'text-muted';
+    dateSmall.textContent = data['created_at'];
+
+    columnDiv.appendChild(messageSmall);
+    columnDiv.appendChild(dateSmall);
+
+    link.appendChild(columnDiv);
+    listItem.appendChild(link);
+
+    pushNotificationList.insertAdjacentElement('afterbegin', listItem);
 };
