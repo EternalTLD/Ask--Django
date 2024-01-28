@@ -45,6 +45,20 @@ class QuestionViewSet(VoteActionsMixin, viewsets.ModelViewSet):
         serializer = self.get_serializer(similar_questions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=["get"])
+    def search(self, request):
+        """
+        Question search
+        """
+        query = request.GET.get("query")
+        if query:
+            questions = Question.published.search(query)
+            serializer = self.get_serializer(questions, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {"error": "query is required"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()

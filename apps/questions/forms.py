@@ -15,7 +15,3 @@ class AnswerForm(forms.ModelForm):
         fields = [
             "content",
         ]
-
-
-class SearchForm(forms.Form):
-    query = forms.CharField()

@@ -35,8 +35,10 @@ class PublishedManager(models.Manager):
             cache.set(cache_key, similar_questions, timeout=3600)
         return similar_questions
 
-    def get_popular_questions(self):
+    def get_popular_questions(self, limit=None):
         """Returns query set of the most popular published questions"""
+        if limit:
+            return self.get_queryset().order_by("-views", "-votes")[:limit]
         return self.get_queryset().order_by("-views", "-votes")
 
     def get_popular_tags(self, limit=10):
@@ -51,6 +53,10 @@ class PublishedManager(models.Manager):
             )
             cache.set(cache_key, tags, timeout=86400)
         return tags
+
+    def search(self, query):
+        lookup = models.Q(title__icontains=query) | models.Q(content__icontains=query)
+        return self.get_queryset().filter(lookup)
 
 
 class Question(models.Model):

@@ -6,10 +6,10 @@ from django.urls import reverse
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import get_user_model
-from django.contrib.postgres.search import TrigramSimilarity
 from django.views import generic
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_GET
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from taggit.models import Tag
@@ -135,25 +135,15 @@ class QuestionDeleteView(AuthorRequiredMixin, generic.DeleteView):
     context_object_name = "question"
 
 
+@require_GET
 def question_search_view(request: HttpRequest) -> HttpResponse:
-    form = SearchForm()
-    query = None
     results = []
     page_title = "Questions search"
+    query = request.GET.get("query")
 
-    if "query" in request.GET:
-        form = SearchForm(request.GET)
-
-        if form.is_valid():
-            query = form.cleaned_data.get("query")
-            results = (
-                Question.published.annotate(
-                    similarity=TrigramSimilarity("title", query)
-                )
-                .filter(similarity__gt=0.1)
-                .order_by("-similarity")
-            )
-            page_title = f"Questions that contain {query}."
+    if query:
+        results = Question.published.search(query)
+        page_title = f"Questions that contain {query}."
 
     return render(
         request,
