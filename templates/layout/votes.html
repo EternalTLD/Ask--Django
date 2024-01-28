@@ -1,29 +1,27 @@
 {% load static %}
 
 <div class="d-flex flex-row justify-content-left">
-
     <div class="d-flex align-items-start" style="padding: .9rem 0rem .0rem .0rem;">
-        <form id="vote-like-form{{obj.id}}">
+        <form class="vote-form" data-message-id="{{obj.id}}">
             {% csrf_token %}
             <button data-type="{{type}}" data-action="like" type="submit" class="btn">
                 <i class="fa fa-thumbs-up fa-lg" aria-hidden="true">
-                    <span id="total-likes{{obj.id}}">{{obj.votes.count_likes}}</span>
+                    <span class="like-counter" id="total-likes{{obj.id}}">{{obj.votes.count_likes}}</span>
                 </i>
             </button>
         </form>
     </div>
 
     <div class="d-flex align-items-start" style="padding: .9rem 0rem .0rem .0rem;">
-        <form id="vote-dislike-form{{obj.id}}">
+        <form class="vote-form" data-message-id="{{obj.id}}">
             {% csrf_token %}
             <button data-type="{{type}}" data-action="dislike" type="submit" class="btn">
                 <i class="fa fa-thumbs-down fa-lg" aria-hidden="true">
-                    <span id="total-dislikes{{obj.id}}">{{ obj.votes.count_dislikes}}</span>
+                    <span class="dislike-counter" id="total-dislikes{{obj.id}}">{{ obj.votes.count_dislikes}}</span>
                 </i>
             </button>
         </form>
     </div>
-    {{obj.id|json_script:"obj_id"}}
 </div>
 
 <script src="{% static 'js/votes.js' %}"></script>
