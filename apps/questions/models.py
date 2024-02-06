@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.contenttypes.fields import GenericRelation
-from django.db.models import Count
+from django.db.models import Count, QuerySet, Q
 from django.utils.text import slugify
 from django.core.cache import cache
 
@@ -15,11 +17,13 @@ from apps.votes.models import Vote
 class PublishedManager(models.Manager):
     """Published questions manager"""
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Question]:
         """Returns query set of published questions"""
         return super().get_queryset().filter(draft=False)
 
-    def get_similar_questions(self, question, limit=4):
+    def get_similar_questions(
+        self, question: Question, limit: int = 4
+    ) -> QuerySet[Question]:
         """Returns query set of published questions similar to a specific question"""
         cache_key = f"similar_questions_{question.id}"
         similar_questions = cache.get(cache_key)
@@ -35,27 +39,27 @@ class PublishedManager(models.Manager):
             cache.set(cache_key, similar_questions, timeout=3600)
         return similar_questions
 
-    def get_popular_questions(self, limit=None):
+    def get_popular_questions(self, limit: int = None) -> QuerySet[Question]:
         """Returns query set of the most popular published questions"""
         if limit:
             return self.get_queryset().order_by("-views", "-votes")[:limit]
         return self.get_queryset().order_by("-views", "-votes")
 
-    def get_popular_tags(self, limit=10):
+    def get_popular_tags(self, limit: int = 10) -> QuerySet[Tag]:
         """Returns the most popular tags"""
         cache_key = "popular_tags_list"
         tags = cache.get(cache_key)
         if tags is None:
             tags = (
                 Tag.objects.filter(question__draft=False)
-                .annotate(total_questions=models.Count("question"))
+                .annotate(total_questions=Count("question"))
                 .order_by("-total_questions")[:limit]
             )
             cache.set(cache_key, tags, timeout=86400)
         return tags
 
-    def search(self, query):
-        lookup = models.Q(title__icontains=query) | models.Q(content__icontains=query)
+    def search(self, query: str) -> QuerySet[Question]:
+        lookup = Q(title__icontains=query) | Q(content__icontains=query)
         return self.get_queryset().filter(lookup)
 
 
