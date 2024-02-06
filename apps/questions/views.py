@@ -1,9 +1,11 @@
 from typing import Any
+
 from django.db.models import F
 from django.db.models.query import QuerySet
+from django.forms.models import BaseModelForm
 from django.utils.text import slugify
 from django.urls import reverse
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import get_user_model
 from django.views import generic
@@ -14,7 +16,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from taggit.models import Tag
 from .models import Question, Answer
-from .forms import AnswerForm, QuestionForm, SearchForm
+from .forms import AnswerForm, QuestionForm
 from .mixins import AuthorRequiredMixin
 
 
@@ -26,14 +28,17 @@ class QuestionsListView(generic.ListView):
     queryset = Question.published.all()
     context_object_name = "questions_list"
     paginate_by = 10
+    page_title = "Last questions"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["page_title"] = "Last questions"
+        context["page_title"] = self.page_title
         return context
 
 
 class QuestionsByTagListView(QuestionsListView):
+    page_title = "Questions tagged #"
+
     def get_queryset(self) -> QuerySet[Question]:
         tag_slug = self.kwargs.get("tag_slug")
         tag = get_object_or_404(Tag, slug=tag_slug)
@@ -41,17 +46,13 @@ class QuestionsByTagListView(QuestionsListView):
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
-        context["page_title"] = f"Questions tagged #{self.kwargs.get('tag_slug')}"
+        context["page_title"] = f"{self.page_title}{self.kwargs.get('tag_slug')}"
         return context
 
 
 class PopularQuestionsListView(QuestionsListView):
     queryset = Question.published.get_popular_questions()
-
-    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
-        context["page_title"] = "Popular questions"
-        return context
+    page_title = "Popular questions"
 
 
 class QuestionDetailView(generic.DetailView):
@@ -101,21 +102,19 @@ class QuestionView(generic.View):
 
 class QuestionCreateView(LoginRequiredMixin, generic.CreateView):
     template_name = "questions/question_create_form.html"
-    success_url = "/"
     form_class = QuestionForm
 
-    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
-        form = QuestionForm(request.POST)
-        if form.is_valid():
-            title = form.cleaned_data.get("title")
-            form.instance.slug = slugify(title)
-            form.instance.author_id = request.user.id
-            form.save()
-        return HttpResponseRedirect(
-            reverse(
-                "questions:detail",
-                kwargs={"pk": form.instance.id, "slug": form.instance.slug},
-            )
+    def form_valid(self, form: BaseModelForm) -> HttpResponse:
+        title = form.cleaned_data.get("title")
+        form.instance.slug = slugify(title)
+        form.instance.author = self.request.user
+        form.save()
+        return super().form_valid(form)
+
+    def get_success_url(self) -> str:
+        question = self.object
+        return reverse(
+            "questions:detail", kwargs={"pk": question.id, "slug": question.slug}
         )
 
 
