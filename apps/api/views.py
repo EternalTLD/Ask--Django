@@ -18,6 +18,16 @@ class QuestionViewSet(VoteActionsMixin, viewsets.ModelViewSet):
     serializer_class = serializers.QuestionSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
 
+    @action(detail=True, methods=["get"], serializer_class=serializers.AnswerSerializer)
+    def answers(self, request, pk):
+        """
+        Returns list of answers for specific question.
+        """
+        question = self.get_object()
+        answers = Answer.objects.filter(question=question)
+        serializer = self.get_serializer(answers, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     @action(
         detail=True,
         methods=["post"],
