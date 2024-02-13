@@ -6,7 +6,7 @@ from asgiref.sync import async_to_sync
 
 @shared_task
 def send_notification_task(notification: dict) -> None:
-    """Handler to send notification"""
+    """Handler to send push notification"""
     channel_layer = get_channel_layer()
     receiver = notification.get("to_user_username")
     async_to_sync(channel_layer.group_send)(

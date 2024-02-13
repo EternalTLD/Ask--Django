@@ -64,11 +64,11 @@ class VoteActionsMixin:
     vote (like or dislike) for a particular object.
     """
 
-    @action(detail=True, methods=["post", "get"])
+    @action(detail=True, methods=["post"])
     def add_like(self, request, pk):
         return self._vote(request.user, "like")
 
-    @action(detail=True, methods=["post", "get"])
+    @action(detail=True, methods=["post"])
     def add_dislike(self, request, pk):
         return self._vote(request.user, "dislike")
 

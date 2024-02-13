@@ -39,7 +39,7 @@ class UserRegistrationForm(UserCreationForm):
             raise forms.ValidationError("Password mismatch!")
         return password2
 
-    def save(self, commit: bool = True) -> User:
+    def save(self, commit: bool = True):
         user = super(UserCreationForm, self).save(commit=False)
         user.first_name = self.cleaned_data.get("first_name").capitalize()
         user.last_name = self.cleaned_data.get("last_name").capitalize()
