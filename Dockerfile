@@ -5,8 +5,15 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-RUN apk add --no-cache postgresql-libs postgresql-client libffi-dev
-RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev
+RUN apk update && \
+    apk add --no-cache \
+    postgresql-libs \
+    postgresql-client \
+    libffi-dev \
+    postgresql-dev \
+    gcc \
+    python3-dev \
+    musl-dev
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
