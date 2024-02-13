@@ -15,7 +15,7 @@
 ## Установка
 Для развертывания приложения необходим Docker.
 ```sh
-https://github.com/EternalTLD/Ask--Django.git
+git clone https://github.com/EternalTLD/Ask--Django.git
 ```
 ```sh
 cd Ask--Django
