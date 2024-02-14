@@ -22,7 +22,7 @@ class ProfileDetailView(generic.DetailView):
         return get_object_or_404(
             self.model.objects.select_related("profile").prefetch_related(
                 Prefetch(
-                    "questions", queryset=Question.objects.prefetch_related("tags")
+                    "questions", queryset=Question.published.get_all_questions()
                 )
             ),
             username=username,
