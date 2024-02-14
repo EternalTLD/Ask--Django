@@ -8,6 +8,7 @@ db.sqlite3
 db.sqlite3-journal
 /static/admin/
 /static/rest_framework/
+/static/debug_toolbar/
 
 ### Django.Python Stack ###
 # Byte-compiled / optimized / DLL files
