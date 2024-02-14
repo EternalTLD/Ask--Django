@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from apps.questions.models import Question, Answer
 from apps.notifications.models import Notification
 from .permissions import IsAuthorOrReadOnly, IsAuthor
-from .mixins import VoteActionsMixin
+from .actions import VoteActionsMixin
 from . import serializers
 
 
@@ -91,7 +91,6 @@ class UserViewSet(viewsets.ModelViewSet):
         detail=True,
         methods=["get"],
         serializer_class=serializers.QuestionSerializer,
-        permission_classes=[IsAuthor],
     )
     def all_questions(self, request, pk):
         """

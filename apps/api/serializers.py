@@ -5,7 +5,7 @@ from taggit.serializers import TaggitSerializer, TagListSerializerField
 from apps.questions.models import Question, Answer
 from apps.profiles.models import Profile
 from apps.notifications.models import Notification
-from .mixins import VoteCountFieldMixin, URIFieldMixin
+from .fields import VoteCountFieldMixin, URIFieldMixin
 
 
 User = get_user_model()
@@ -90,4 +90,4 @@ class NotificationSerializer(URIFieldMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Notification
-        exclude = ["to_user", "url"]
+        exclude = ["to_user", "url", "from_user"]
