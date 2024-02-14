@@ -6,7 +6,7 @@
             {% csrf_token %}
             <button data-type="{{type}}" data-action="like" type="submit" class="btn">
                 <i class="fa fa-thumbs-up fa-lg" aria-hidden="true">
-                    <span class="like-counter" id="total-likes{{obj.id}}">{{obj.votes.count_likes}}</span>
+                    <span class="like-counter" id="total-likes{{obj.id}}">{{obj.likes_count}}</span>
                 </i>
             </button>
         </form>
@@ -17,7 +17,7 @@
             {% csrf_token %}
             <button data-type="{{type}}" data-action="dislike" type="submit" class="btn">
                 <i class="fa fa-thumbs-down fa-lg" aria-hidden="true">
-                    <span class="dislike-counter" id="total-dislikes{{obj.id}}">{{ obj.votes.count_dislikes}}</span>
+                    <span class="dislike-counter" id="total-dislikes{{obj.id}}">{{ obj.dislikes_count}}</span>
                 </i>
             </button>
         </form>

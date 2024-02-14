@@ -6,7 +6,7 @@ from django.forms.models import BaseModelForm
 from django.utils.text import slugify
 from django.urls import reverse
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from django.views import generic
 from django.contrib.auth.decorators import login_required
@@ -14,7 +14,6 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from taggit.models import Tag
 from .models import Question, Answer
 from .forms import AnswerForm, QuestionForm
 from .mixins import AuthorRequiredMixin
@@ -25,7 +24,7 @@ User = get_user_model()
 
 class QuestionsListView(generic.ListView):
     template_name = "questions/index.html"
-    queryset = Question.published.all()
+    queryset = Question.published.get_all_questions()
     context_object_name = "questions_list"
     paginate_by = 10
     page_title = "Last questions"
@@ -41,8 +40,7 @@ class QuestionsByTagListView(QuestionsListView):
 
     def get_queryset(self) -> QuerySet[Question]:
         tag_slug = self.kwargs.get("tag_slug")
-        tag = get_object_or_404(Tag, slug=tag_slug)
-        return Question.published.filter(tags__in=[tag])
+        return Question.published.get_tagged_questions(tag_slug)
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)

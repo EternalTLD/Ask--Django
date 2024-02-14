@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.db import models
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib.contenttypes.fields import GenericRelation
@@ -20,6 +21,36 @@ class PublishedManager(models.Manager):
     def get_queryset(self) -> QuerySet[Question]:
         """Returns query set of published questions"""
         return super().get_queryset().filter(draft=False)
+    
+    def get_all_questions(self) -> QuerySet[Question]:
+        """Returns query set of all published questions"""
+        queryset = (
+            self.get_queryset()
+            .select_related("author", "author__profile")
+            .prefetch_related("tags")
+            .annotate(
+                likes_count=Count(
+                    models.Case(
+                        models.When(votes__vote=1, then=1),
+                        output_field=models.IntegerField(),
+                    )
+                ),
+                dislikes_count=Count(
+                    models.Case(
+                        models.When(votes__vote=-1, then=1),
+                        output_field=models.IntegerField(),
+                    )
+                ),
+            )
+            .all()
+        )
+        return queryset
+    
+    def get_tagged_questions(self, tag):
+        """Returns query set of all published questions tagged by `tag`"""
+        tag = get_object_or_404(Tag, slug=tag)
+        queryset = self.get_all_questions().filter(tags__in=[tag])
+        return queryset
 
     def get_similar_questions(
         self, question: Question, limit: int = 4
@@ -40,10 +71,10 @@ class PublishedManager(models.Manager):
         return similar_questions
 
     def get_popular_questions(self, limit: int = None) -> QuerySet[Question]:
-        """Returns query set of the most popular published questions"""
+        """Returns query set of popular published questions"""
         if limit:
-            return self.get_queryset().order_by("-views", "-votes")[:limit]
-        return self.get_queryset().order_by("-views", "-votes")
+            return self.get_all_questions().order_by("-views", "-votes")[:limit]
+        return self.get_all_questions().order_by("-views", "-votes")
 
     def get_popular_tags(self, limit: int = 10) -> QuerySet[Tag]:
         """Returns the most popular tags"""
@@ -60,7 +91,7 @@ class PublishedManager(models.Manager):
 
     def search(self, query: str) -> QuerySet[Question]:
         lookup = Q(title__icontains=query) | Q(content__icontains=query)
-        return self.get_queryset().filter(lookup)
+        return self.get_all_questions().filter(lookup)
 
 
 class Question(models.Model):
