@@ -51,8 +51,6 @@
                 <li class="list-group-item list-group-item-primary">На сайте с {{ user.date_joined|date:"d-m-Y" }}</li>
                 <li class="list-group-item list-group-item-primary">Задано вопросов - {{ user.pk|count_user_questions }}</li>
                 <li class="list-group-item list-group-item-primary">Отправлено ответов - {{ user.pk|count_user_answers }}</li>
-                <li class="list-group-item list-group-item-success">Получено лайков - </li>
-                <li class="list-group-item list-group-item-danger">Получено дизлайков - </li>
             </ul>
         </div>
     </div>

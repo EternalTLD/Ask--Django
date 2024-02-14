@@ -24,4 +24,6 @@
     </div>
 </div>
 
-<script src="{% static 'js/votes.js' %}"></script>
+{% if request.user.is_authenticated %}
+    <script src="{% static 'js/votes.js' %}"></script>
+{% endif %}
