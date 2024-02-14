@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views import generic
 from django.db.models.query import QuerySet
 from django.db import transaction
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Prefetch
 
 from apps.users.models import User
 from apps.questions.models import Question
@@ -20,7 +20,11 @@ class ProfileDetailView(generic.DetailView):
     def get_object(self) -> User:
         username = self.kwargs.get("username")
         return get_object_or_404(
-            self.model.objects.select_related("profile").prefetch_related("questions"),
+            self.model.objects.select_related("profile").prefetch_related(
+                Prefetch(
+                    "questions", queryset=Question.objects.prefetch_related("tags")
+                )
+            ),
             username=username,
         )
 
@@ -34,9 +38,13 @@ class UserFavoriteQuestionList(generic.ListView):
     def get_queryset(self) -> QuerySet[Question]:
         username = self.kwargs.get("username")
         user = get_object_or_404(User, username=username)
-        questions = Question.published.annotate(
-            vote_count=Count("votes", filter=Q(votes__vote=1, votes__user=user))
-        ).filter(vote_count__gt=0)
+        questions = (
+            Question.published.get_all_questions()
+            .annotate(
+                vote_count=Count("votes", filter=Q(votes__vote=1, votes__user=user))
+            )
+            .filter(vote_count__gt=0)
+        )
         return questions
 
 

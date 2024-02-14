@@ -14,7 +14,7 @@ User = get_user_model()
 
 
 class QuestionViewSet(VoteActionsMixin, viewsets.ModelViewSet):
-    queryset = Question.published.all()
+    queryset = Question.published.get_all_questions()
     serializer_class = serializers.QuestionSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
 

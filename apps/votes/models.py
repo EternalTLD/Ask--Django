@@ -10,12 +10,22 @@ class VoteManager(models.Manager):
 
     def count_likes(self):
         """Returns value of object likes"""
-        likes = self.get_queryset().filter(vote=1).aggregate(models.Count('id'))['id__count'] or 0
+        likes = (
+            self.get_queryset()
+            .filter(vote=1)
+            .aggregate(models.Count("id"))["id__count"]
+            or 0
+        )
         return likes
 
     def count_dislikes(self):
         """Returns value of object dislikes"""
-        dislikes = self.get_queryset().filter(vote=-1).aggregate(models.Count('id'))['id__count'] or 0
+        dislikes = (
+            self.get_queryset()
+            .filter(vote=-1)
+            .aggregate(models.Count("id"))["id__count"]
+            or 0
+        )
         return dislikes
 
     def has_user_voted(self, user):

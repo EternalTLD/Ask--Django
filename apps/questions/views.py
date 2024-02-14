@@ -1,6 +1,6 @@
 from typing import Any
 
-from django.db.models import F
+from django.db import models
 from django.db.models.query import QuerySet
 from django.forms.models import BaseModelForm
 from django.utils.text import slugify
@@ -62,7 +62,7 @@ class QuestionDetailView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         context["form"] = AnswerForm()
         question = self.get_object()
-        context["answers"] = question.answers.filter(active=True)
+        context["answers"] = Question.published.get_question_answers(question)
         context["similar_questions"] = Question.published.get_similar_questions(
             question
         )
@@ -83,7 +83,7 @@ class QuestionView(generic.View):
     def get(self, request: HttpRequest, *args: str, **kwargs: Any) -> HttpResponse:
         view = QuestionDetailView.as_view()
         question_id = self.kwargs.get("pk")
-        Question.objects.filter(pk=question_id).update(views=F("views") + 1)
+        Question.objects.filter(pk=question_id).update(views=models.F("views") + 1)
         return view(request, *args, **kwargs)
 
     @method_decorator(login_required())
