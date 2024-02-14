@@ -29,6 +29,7 @@ def send_vote_notification(obj: Model, vote_type: int, user: User) -> None:
         to_user=obj.author,
         message=message,
         url=url,
+        sent=True,
     )
 
     send_notification_task.delay(notification.to_json())
@@ -41,6 +42,7 @@ def send_answer_notification(answer: Answer, question: Question) -> None:
         to_user=question.author,
         message=f"New answer on {str(question)}",
         url=question.get_absolute_url(),
+        sent=True,
     )
 
     send_notification_task.delay(notification.to_json())
